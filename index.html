@@ -11,7 +11,13 @@
     <link rel="stylesheet" href="assets/vendors/themify-icons/css/themify-icons.css">
     <!-- Bootstrap + Rubic main styles -->
 	<link rel="stylesheet" href="assets/css/rubic.css">
+	<!-- favicon-->
 	<link rel="icon" type="image/x-icon" href="/assets/imgs/favicon.ico">
+	<!-- jquery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+	<!-- tabulator -->
+	<link href="assets/css/tabulator/tabulator.min.css" rel="stylesheet">
+	<script type="text/javascript" src="assets/js/tabulator/tabulator.min.js"></script>
 </head>
 <body data-spy="scroll" data-target=".navbar" data-offset="40" id="home">
 
@@ -84,35 +90,34 @@
 	<section class="section" id="servers">
         <div class="container text-center">
             <h6 class="display-4 has-line">SERVERS</h6>
-			<br><br>
-			<table class="table table-striped">
-				<tr>
-					<th>Name</th>
-					<th>Mayors</th>
-					<th>Online</th>
-					<th>Claimed</th>
-				</tr>
-				<tr>
-					<td>sdfasdf</td>
-					<td>sdfasdf</td>
-					<td>sdfasdf</td>
-					<td>sdfasdf</td>
-				</tr>
-				<tr>
-					<td>sdfasdf</td>
-					<td>sdfasdf</td>
-					<td>sdfasdf</td>
-					<td>sdfasdf</td>
-				</tr>
-				<tr>
-					<td>sdfasdf</td>
-					<td>sdfasdf</td>
-					<td>sdfasdf</td>
-					<td>sdfasdf</td>
-				</tr>
-			</table>
+			<br>
+			<div id="server-list"></div>
 			<script>
-				
+
+				var tabledata = [];
+
+				$.getJSON('http://api.sc4mp.org/servers/', function(data) {
+					for (server in data) {
+						try {
+							var entry = {
+								"Name": server.info.server_name,
+								"Mayors": server.stats.stat_mayors,
+								"Online": server.stats.stat_mayors_online,
+								"Claimed":  server.stats.stat_claimed,
+								"Download":  server.stats.stat_download,
+							};
+							tabledata.push(entry);
+						} catch (e) {
+							console.log(e);
+						};
+					};
+				});
+
+				var table = new Tabulator("#server-list", {
+					data:tabledata,
+					autoColumns:true,
+				});
+
 			</script>
 		</div>
 	</section>
