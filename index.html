@@ -94,28 +94,79 @@
 			<div id="server-list"></div>
 			<script>
 
-				var tabledata = [];
+				function format_filesize(size) {
+					if (size >= 10 ** 11) {
+						return ">99GB"
+					} else if (size >= 10 ** 10) {
+						return Math.floor(size / (10 ** 9)) + "GB"
+					} else if (size >= 10 ** 9) {
+						return Math.floor(size / (10 ** 8)) / 10 + "GB"
+					} else if (size >= 10 ** 8) {
+						return Math.floor(size / (10 ** 6)) + "MB"
+					} else if (size >= 10 ** 7) {
+						return Math.floor(size / (10 ** 6)) + "MB"
+				 	} else if (size >= 10 ** 6) {
+						return Math.floor(size / (10 ** 5)) / 10 + "MB"
+				    } else if (size >= 10 ** 5) {
+						return Math.floor(size / (10 ** 3)) + "KB"
+					} else if (size >= 10 ** 4) {
+						return Math.floor(size / (10 ** 3)) + "KB"
+					} else if (size >= 10 ** 3) {
+						return Math.floor(size / (10 ** 2)) / 10 + "KB"
+					} else {
+						return size + "B"
+					}
+				}
 
 				$.getJSON('http://api.sc4mp.org/servers/', function(data) {
-					for (server in data) {
+					
+					const tabledata = [];
+					
+					$.each(data, function(i, server) {
 						try {
-							var entry = {
-								"Name": server.info.server_name,
-								"Mayors": server.stats.stat_mayors,
-								"Online": server.stats.stat_mayors_online,
-								"Claimed":  server.stats.stat_claimed,
-								"Download":  server.stats.stat_download,
-							};
+							let entry = {};
+							entry["Private"] = server.info.password_enabled;
+							entry["Name"] = server.info.server_name;
+							entry["Mayors"] = server.stats.stat_mayors;
+							entry["Online"] = server.stats.stat_mayors_online;
+							entry["Claimed"] = server.stats.stat_claimed;
+							entry["Download"] = server.stats.stat_download;
+							entry["Address"] = server.host + ":" + server.port;
 							tabledata.push(entry);
 						} catch (e) {
-							console.log(e);
+							try {
+								let entry = {};
+								entry["Private"] = server.info.password_enabled;
+								entry["Name"] = server.info.server_name;
+								entry["Mayors"] = -1;
+								entry["Online"] = -1;
+								entry["Claimed"] = -1;
+								entry["Download"] = -1;
+								entry["Address"] = server.host + ":" + server.port;
+								tabledata.push(entry);
+							} catch (e) {
+								console.log(e)
+							}
 						};
-					};
-				});
+					});
 
-				var table = new Tabulator("#server-list", {
-					data:tabledata,
-					autoColumns:true,
+					var table = new Tabulator("#server-list", {
+						width: "auto",
+						height: "100%",
+						layout: "fitColumns",
+						responsiveLayout:"hide",
+						data:tabledata,
+						columns:[
+							{title: "", field: "Private", resizable: false, hozAlign:"center", sorter: "string", width: 50, responsive: 2, formatter: function(cell) {return (cell.getValue() == true) ? "PWD" : ""}},
+							{title: "Name", field: "Name", resizable: false, hozAlign:"left", sorter: "string", minWidth: 200, responsive: 0},
+							{title: "Mayors", field: "Mayors", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 3, formatter: function(cell) {return (cell.getValue() == -1) ? "" : cell.getValue()}},
+							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 4, formatter: function(cell) {return (cell.getValue() == -1) ? "" : cell.getValue()}},
+							{title: "Claimed", field: "Claimed", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 5, formatter: function(cell) {return (cell.getValue() == -1) ? "" : Math.floor(cell.getValue() * 100) + "%"}},
+							{title: "Download", field: "Download", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 6, formatter: function(cell) {return (cell.getValue() == -1) ? "" : format_filesize(cell.getValue())}},
+							{title: "Address", field: "Address", resizable: false, hozAlign:"center", sorter: "string", width: 200, responsive: 1},
+						],
+					});
+
 				});
 
 			</script>
