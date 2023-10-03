@@ -120,7 +120,7 @@
 					}
 				}
 
-				$.getJSON('http://api.sc4mp.org/servers/', function(data) {
+				$.getJSON('http://api.sc4mp.org/example-servers', function(data) {
 					
 					const tabledata = [];
 					
@@ -145,7 +145,7 @@
 								entry["Claimed"] = null;
 								entry["Download"] = null;
 								entry["Address"] = server.host + ":" + server.port;
-								tabledata.push(entry);
+								// tabledata.push(entry);
 							} catch (e) {
 								console.log(e)
 							}
@@ -168,7 +168,7 @@
 							{title: "", field: "Address", resizable: false, hozAlign:"center", sorter: "string", width: 200, responsive: 1},
 						],
 						initialSort:[
-							{column:"Mayors", dir:"desc"},
+							{column:"Mayors", dir:"asc"},
 						],
 					});
 
