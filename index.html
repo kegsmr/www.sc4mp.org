@@ -18,6 +18,8 @@
 	<!-- tabulator -->
 	<link href="assets/css/tabulator/tabulator.min.css" rel="stylesheet">
 	<script type="text/javascript" src="assets/js/tabulator/tabulator.min.js"></script>
+	<!-- moment.js -->
+	<script type="text/javascript" src="assets/js/moment.js"></script>
 </head>
 <body data-spy="scroll" data-target=".navbar" data-offset="40" id="home">
 
@@ -138,10 +140,10 @@
 								let entry = {};
 								entry["Private"] = server.info.password_enabled;
 								entry["Name"] = server.info.server_name;
-								entry["Mayors"] = -1;
-								entry["Online"] = -1;
-								entry["Claimed"] = -1;
-								entry["Download"] = -1;
+								entry["Mayors"] = null;
+								entry["Online"] = null;
+								entry["Claimed"] = null;
+								entry["Download"] = null;
 								entry["Address"] = server.host + ":" + server.port;
 								tabledata.push(entry);
 							} catch (e) {
@@ -152,18 +154,21 @@
 
 					var table = new Tabulator("#server-list", {
 						width: "auto",
-						height: "100%",
+						maxHeight: "500px",
 						layout: "fitColumns",
 						responsiveLayout:"hide",
 						data:tabledata,
 						columns:[
 							{title: "", field: "Private", resizable: false, hozAlign:"center", sorter: "string", width: 50, responsive: 2, formatter: function(cell) {return (cell.getValue() == true) ? "PWD" : ""}},
 							{title: "Name", field: "Name", resizable: false, hozAlign:"left", sorter: "string", minWidth: 200, responsive: 0},
-							{title: "Mayors", field: "Mayors", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 3, formatter: function(cell) {return (cell.getValue() == -1) ? "" : cell.getValue()}},
-							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 4, formatter: function(cell) {return (cell.getValue() == -1) ? "" : cell.getValue()}},
-							{title: "Claimed", field: "Claimed", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 5, formatter: function(cell) {return (cell.getValue() == -1) ? "" : Math.floor(cell.getValue() * 100) + "%"}},
-							{title: "Download", field: "Download", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 6, formatter: function(cell) {return (cell.getValue() == -1) ? "" : format_filesize(cell.getValue())}},
-							{title: "Address", field: "Address", resizable: false, hozAlign:"center", sorter: "string", width: 200, responsive: 1},
+							{title: "Mayors", field: "Mayors", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 3, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
+							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 4, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
+							{title: "Claimed", field: "Claimed", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 5, formatter: function(cell) {return (cell.getValue() == null) ? "" : Math.floor(cell.getValue() * 100) + "%"}},
+							{title: "Download", field: "Download", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 6, formatter: function(cell) {return (cell.getValue() == null) ? "" : format_filesize(cell.getValue())}},
+							{title: "", field: "Address", resizable: false, hozAlign:"center", sorter: "string", width: 200, responsive: 1},
+						],
+						initialSort:[
+							{column:"Mayors", dir:"desc"},
 						],
 					});
 
