@@ -160,7 +160,10 @@
 						responsiveLayout:"hide",
 						data:tabledata,
 						columns:[
-							{title: "", field: "Private", resizable: false, hozAlign:"center", sorter: "string", width: 50, responsive: 2, formatter: "image"},
+							{title: "", field: "Private", resizable: false, hozAlign:"center", sorter: "string", width: 30, responsive: 2, formatter: "image", formatterParams:{
+								height:"20px",
+								width:"15px",
+							}},
 							{title: "Name", field: "Name", resizable: false, hozAlign:"left", sorter: "string", minWidth: 200, responsive: 0},
 							{title: "Mayors", field: "Mayors", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 3, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
 							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 4, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
