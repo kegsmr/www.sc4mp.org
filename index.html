@@ -125,10 +125,14 @@
 					const tabledata = [];
 					
 					$.each(data, function(i, server) {
+						if (!/^https?:\/\//i.test(server.info.server_url)) {
+							server.info.server_url = 'http://' + server.info.server_url;
+						};
 						try {
 							let entry = {};
 							entry["Private"] = server.info.password_enabled ? "assets/imgs/lock-icon.png" : "assets/imgs/blank-icon.png";
 							entry["Name"] = server.info.server_name;
+							entry["URL"] = server.info.server_url;
 							entry["Mayors"] = Number(server.stats.stat_mayors);
 							entry["Online"] = Number(server.stats.stat_mayors_online);
 							entry["Claimed"] = Number(server.stats.stat_claimed);
@@ -141,6 +145,7 @@
 								let entry = {};
 								entry["Private"] = server.info.password_enabled ? "assets/imgs/lock-icon.png" : "assets/imgs/blank-icon.png";
 								entry["Name"] = server.info.server_name;
+								entry["URL"] = server.info.server_url;
 								entry["Mayors"] = null;
 								entry["Online"] = null;
 								entry["Claimed"] = null;
@@ -164,7 +169,10 @@
 								height:"20px",
 								width:"15px",
 							}},
-							{title: "Name", field: "Name", resizable: false, hozAlign:"left", sorter: "string", minWidth: 200, responsive: 0},
+							{title: "Name", field: "URL", resizable: false, hozAlign:"left", sorter: "string", minWidth: 200, responsive: 0, formatter:"link", formatterParams:{
+								labelField:"Name",
+								target:"_blank",
+							}},
 							{title: "Mayors", field: "Mayors", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 3, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
 							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 4, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
 							{title: "Claimed", field: "Claimed", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 5, formatter: function(cell) {return (cell.getValue() == null) ? "" : Math.floor(cell.getValue() * 100) + "%"}},
