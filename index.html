@@ -120,25 +120,26 @@
 					}
 				}
 
-				$.getJSON('http://api.sc4mp.org/example-servers', function(data) {
+				$.getJSON('http://api.sc4mp.org/servers', function(data) {
 					
 					const tabledata = [];
 					
 					$.each(data, function(i, server) {
 						try {
 							let entry = {};
-							entry["Private"] = server.info.password_enabled;
+							entry["Private"] = server.info.password_enabled ? "assets/imgs/lock-icon.png" : "assets/imgs/blank-icon.png";
 							entry["Name"] = server.info.server_name;
-							entry["Mayors"] = server.stats.stat_mayors;
-							entry["Online"] = server.stats.stat_mayors_online;
-							entry["Claimed"] = server.stats.stat_claimed;
-							entry["Download"] = server.stats.stat_download;
+							entry["Mayors"] = Number(server.stats.stat_mayors);
+							entry["Online"] = Number(server.stats.stat_mayors_online);
+							entry["Claimed"] = Number(server.stats.stat_claimed);
+							entry["Download"] = Number(server.stats.stat_download);
 							entry["Address"] = server.host + ":" + server.port;
 							tabledata.push(entry);
+							console.log(String(server.info.password_enabled))
 						} catch (e) {
 							try {
 								let entry = {};
-								entry["Private"] = server.info.password_enabled;
+								entry["Private"] = server.info.password_enabled ? "assets/imgs/lock-icon.png" : "assets/imgs/blank-icon.png";
 								entry["Name"] = server.info.server_name;
 								entry["Mayors"] = null;
 								entry["Online"] = null;
@@ -159,16 +160,16 @@
 						responsiveLayout:"hide",
 						data:tabledata,
 						columns:[
-							{title: "", field: "Private", resizable: false, hozAlign:"center", sorter: "string", width: 50, responsive: 2, formatter: function(cell) {return (cell.getValue() == true) ? "PWD" : ""}},
+							{title: "", field: "Private", resizable: false, hozAlign:"center", sorter: "string", width: 50, responsive: 2, formatter: "image"},
 							{title: "Name", field: "Name", resizable: false, hozAlign:"left", sorter: "string", minWidth: 200, responsive: 0},
-							{title: "Mayors", field: "Mayors", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 3, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
-							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 4, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
-							{title: "Claimed", field: "Claimed", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 5, formatter: function(cell) {return (cell.getValue() == null) ? "" : Math.floor(cell.getValue() * 100) + "%"}},
-							{title: "Download", field: "Download", resizable: false, hozAlign:"center", sorter: "numeric", width: 100, responsive: 6, formatter: function(cell) {return (cell.getValue() == null) ? "" : format_filesize(cell.getValue())}},
+							{title: "Mayors", field: "Mayors", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 3, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
+							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 4, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
+							{title: "Claimed", field: "Claimed", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 5, formatter: function(cell) {return (cell.getValue() == null) ? "" : Math.floor(cell.getValue() * 100) + "%"}},
+							{title: "Download", field: "Download", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 6, formatter: function(cell) {return (cell.getValue() == null) ? "" : format_filesize(cell.getValue())}},
 							{title: "", field: "Address", resizable: false, hozAlign:"center", sorter: "string", width: 200, responsive: 1},
 						],
 						initialSort:[
-							{column:"Mayors", dir:"asc"},
+							{column:"Mayors", dir:"dec"},
 						],
 					});
 
@@ -182,15 +183,15 @@
             <h6 class="display-4 has-line">DOWNLOADS</h6>
 			<br><br>
             <div class = "row">
-                <div class="col">
+                <div class="col" style=" padding-bottom: 75px;">
                     <h4>Launcher</h4>
 					<br>
 					<p>Runs on...</p>
-					<div style="width: 175px; margin-left: auto; margin-right: auto;">
+					<div style="width: 250px; margin-left: auto; margin-right: auto;">
 						<ul style="text-align: left;">
-							<li>64-bit Windows</li>
-							<li>32-bit Windows</li>
-							<br>
+							<li>Python 3.8</li>
+							<li>64-bit Windows 7/8/10/11</li>
+							<li>32-bit Windows 7/8/10/11</li>
 						</ul>
 					</div>
 					<br>
@@ -200,11 +201,11 @@
                     <h4>Server</h4>
 					<br>
 					<p>Runs on...</p>
-					<div style="width: 175px; margin-left: auto; margin-right: auto;">
+					<div style="width: 250px; margin-left: auto; margin-right: auto;">
 						<ul style="text-align: left;">
 							<li>Python 3.8</li>
-							<li>64-bit Windows</li>
-							<li>32-bit Windows</li>
+							<li>64-bit Windows 7/8/10/11</li>
+							<li>32-bit Windows 7/8/10/11</li>
 						</ul>
 					</div>
 					<br>
