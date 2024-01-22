@@ -124,6 +124,10 @@
 					
 					const tabledata = [];
 					
+                    var total_mayors = 0
+                    var total_mayors_online = 0
+                    var total_servers = 0
+
 					$.each(data, function(i, server) {
 						if (!/^https?:\/\//i.test(server.info.server_url)) {
 							server.info.server_url = 'http://' + server.info.server_url;
@@ -138,8 +142,11 @@
 							entry["Claimed"] = Number(server.stats.stat_claimed);
 							entry["Download"] = Number(server.stats.stat_download);
 							entry["Address"] = server.host + ":" + server.port;
+                            total_mayors += entry["Mayors"];
+                            total_mayors_online += entry["Online"];
+                            total_servers += 1;
 							tabledata.push(entry);
-							console.log(String(server.info.password_enabled))
+							// console.log(String(server.info.password_enabled))
 						} catch (e) {
 							try {
 								let entry = {};
@@ -184,9 +191,17 @@
 						],
 					});
 
+                    if (total_mayors_online == 1) {
+                        document.getElementsByClassName("server-list-subtitle")[0].innerHTML = "Currently " + total_mayors_online + " mayor online out of " + total_mayors + ", accross " + total_servers + " different servers.";
+                    } else {
+                        document.getElementsByClassName("server-list-subtitle")[0].innerHTML = "Currently " + total_mayors_online + " mayors online out of " + total_mayors + ", accross " + total_servers + " different servers.";
+                    };
+
 				});
 
 			</script>
+            <br>
+            <p class="server-list-subtitle"></p>
 		</div>
 	</section>
     <section class="section" id="download">
