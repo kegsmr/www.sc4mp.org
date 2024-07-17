@@ -129,8 +129,12 @@
                     var total_servers = 0
 
 					$.each(data, function(i, server) {
-						if (!/^https?:\/\//i.test(server.info.server_url)) {
-							server.info.server_url = 'http://' + server.info.server_url;
+						try {
+							if (!/^https?:\/\//i.test(server.info.server_url)) {
+								server.info.server_url = 'http://' + server.info.server_url;
+							};	
+						} catch (e) {
+							console.log(e)
 						};
 						try {
 							let entry = {};
@@ -141,7 +145,7 @@
 							entry["Online"] = Number(server.stats.stat_mayors_online);
 							entry["Claimed"] = Number(server.stats.stat_claimed);
 							entry["Download"] = Number(server.stats.stat_download);
-							entry["Address"] = server.host + ":" + server.port;
+							entry["Join"] = server.url;
                             total_mayors += entry["Mayors"];
                             total_mayors_online += entry["Online"];
                             total_servers += 1;
@@ -157,11 +161,11 @@
 								entry["Online"] = null;
 								entry["Claimed"] = null;
 								entry["Download"] = null;
-								entry["Address"] = server.host + ":" + server.port;
+								entry["Join"] =server.url;
 								// tabledata.push(entry);
 							} catch (e) {
 								console.log(e)
-							}
+							};
 						};
 					});
 
@@ -184,7 +188,7 @@
 							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 4, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
 							{title: "Claimed", field: "Claimed", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 5, formatter: function(cell) {return (cell.getValue() == null) ? "" : Math.floor(cell.getValue() * 100) + "%"}},
 							{title: "Download", field: "Download", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 6, formatter: function(cell) {return (cell.getValue() == null) ? "" : format_filesize(cell.getValue())}},
-							{title: "", field: "Address", resizable: false, hozAlign:"center", sorter: "string", width: 200, responsive: 1},
+							{title: "", field: "Join", resizable: false, hozAlign:"center", sorter: "string", width: 100, responsive: 1, formatter: function(cell) {return '<a class="btn btn-primary btn-sm" style="padding-top: 0px; padding-bottom: 0px; width: 80px;" href="' + cell.getValue() + '">Join</a>'}},
 						],
 						initialSort:[
 							{column:"Mayors", dir:"dec"},
