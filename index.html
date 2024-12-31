@@ -45,7 +45,7 @@
                         <a class="nav-link" href="https://patreon.com/sc4mp" target="_blank">Patreon</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-primary text-light shadow-none ml-md-4" href="#download">Download</a>
+                        <a id="download" class="nav-link btn btn-primary text-light shadow-none ml-md-4" href="download/windows/x64/SC4MP Installer.exe">Download</a>
                     </li>
                 </ul>
             </div>
@@ -176,19 +176,19 @@
 						responsiveLayout:"hide",
 						data:tabledata,
 						columns:[
-							{title: "", field: "Private", resizable: false, hozAlign:"center", sorter: "string", width: 30, responsive: 2, formatter: "image", formatterParams:{
+							{title: "", field: "Private", resizable: false, hozAlign:"center", sorter: "string", width: 30, responsive: 1, formatter: "image", formatterParams:{
 								height:"20px",
 								width:"15px",
 							}},
-							{title: "Name", field: "URL", resizable: false, hozAlign:"left", sorter: "string", minWidth: 200, responsive: 0, formatter:"link", formatterParams:{
+							{title: "Name", field: "URL", resizable: false, hozAlign:"left", sorter: "string", minWidth: 150, responsive: 0, formatter:"link", formatterParams:{
 								labelField:"Name",
 								target:"_blank",
 							}},
-							{title: "Mayors", field: "Mayors", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 3, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
-							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 4, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
+							{title: "Mayors", field: "Mayors", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 2, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
+							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 3, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
 							{title: "Claimed", field: "Claimed", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 5, formatter: function(cell) {return (cell.getValue() == null) ? "" : Math.floor(cell.getValue() * 100) + "%"}},
 							{title: "Download", field: "Download", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 6, formatter: function(cell) {return (cell.getValue() == null) ? "" : format_filesize(cell.getValue())}},
-							{title: "", field: "Join", resizable: false, hozAlign:"center", sorter: "string", width: 100, responsive: 1, formatter: function(cell) {return '<a class="btn btn-primary btn-sm" style="padding-top: 0px; padding-bottom: 0px; width: 80px;" href="' + cell.getValue() + '">Join</a>'}},
+							{title: "", field: "Join", resizable: false, hozAlign:"center", sorter: "string", width: 100, responsive: 4, formatter: function(cell) {return '<a class="btn btn-primary btn-sm" style="padding-top: 0px; padding-bottom: 0px; width: 80px;" href="' + cell.getValue() + '">Join</a>'}},
 						],
 						initialSort:[
 							{column:"Mayors", dir:"dec"},
@@ -212,10 +212,12 @@
 		<div class="container text-center">
 			<h6 class="display-4 has-line">DOWNLOAD</h6>
 			<br>
-			<p>asdgsdafgsdfgdsfgdsdfg</p>
+			<p>The installer runs on 64-bit Windows Vista/7/8/10/11.</p>
+			<p>Python <a href="https://github.com/kegsmr/sc4mp-client/releases/latest">source releases</a> on GitHub are cross-platform.</p>
 			<br>
-			<a id="windows-download" class="btn btn-primary btn-lg" href="releases/win32/Setup.exe" download><img src="assets/imgs/windows-icon.png" width="36" height="36">&emsp;Windows</a>&emsp;
-			<a id="source-download" class="btn btn-primary btn-lg" href="" target="_blank"><img src="assets/imgs/python-icon.png" width="36" height="36">&emsp;Python 3.8</a>
+			<a id="download" class="btn btn-primary btn-lg" href="download/windows/x64/SC4MP Installer.exe" download>Download Installer</a>
+			<!--<a id="windows-download" class="btn btn-primary btn-lg" href="releases/win32/Setup.exe" download><img src="assets/imgs/windows-icon.png" width="36" height="36">&emsp;Windows</a>&emsp;
+			<a id="source-download" class="btn btn-primary btn-lg" href="" target="_blank"><img src="assets/imgs/python-icon.png" width="36" height="36">&emsp;Python 3.8</a>-->
 		</div>
 		<script>
 			if (window.navigator.cpuClass=x64) {
