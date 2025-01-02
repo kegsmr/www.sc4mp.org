@@ -45,7 +45,7 @@
                         <a class="nav-link" href="https://patreon.com/sc4mp" target="_blank">Patreon</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-primary text-light shadow-none ml-md-4" href="download/windows/x64/SC4MP Installer.exe">Download</a>
+                        <a class="nav-link btn btn-primary text-light shadow-none ml-md-4 download-link" href="#">Download</a>
                     </li>
                 </ul>
             </div>
@@ -212,18 +212,13 @@
 		<div class="container text-center">
 			<h6 class="display-4 has-line">DOWNLOAD</h6>
 			<br>
-			<p>The installer runs on 64-bit Windows Vista/7/8/10/11.</p>
-			<p>Python <a href="https://github.com/kegsmr/sc4mp-client/releases/latest">source releases</a> on GitHub are cross-platform.</p>
+			<p>The installer runs on Windows Vista/7/8/10/11.</p>
+			<p><a href="https://github.com/kegsmr/sc4mp-client/releases/latest">Python source releases on GitHub are cross-platform.</a></p>
 			<br>
-			<a class="btn btn-primary btn-lg" href="download/windows/x64/SC4MP Installer.exe" download>Download Installer</a>
+			<a class="btn btn-primary btn-lg download-link" href="#">Download Installer</a>
 			<!--<a id="windows-download" class="btn btn-primary btn-lg" href="releases/win32/Setup.exe" download><img src="assets/imgs/windows-icon.png" width="36" height="36">&emsp;Windows</a>&emsp;
 			<a id="source-download" class="btn btn-primary btn-lg" href="" target="_blank"><img src="assets/imgs/python-icon.png" width="36" height="36">&emsp;Python 3.8</a>-->
 		</div>
-		<script>
-			if (window.navigator.cpuClass=x64) {
-
-			}
-		</script>
 	</section>
     <!--<section class="section" id="download">
         <div class="container text-center">
@@ -530,6 +525,48 @@
         </div>-->
     </footer>
 	
+	<script>
+
+		const downloadLinks = document.querySelectorAll('.download-link');
+
+		downloadLinks.forEach(link => {
+
+			link.addEventListener('click', function(event) {
+
+				event.preventDefault();
+
+				const userAgent = navigator.userAgent.toLowerCase();
+				console.log(userAgent)
+
+				let downloadLink = "";
+		
+				if (userAgent.includes("win")) {
+					if (userAgent.includes("wow64") || userAgent.includes("win64")) {
+						downloadLink = "https://www.sc4mp.org/download/windows/x64/SC4MP Installer.exe";
+					} else {
+						downloadLink = "https://www.sc4mp.org/download/windows/x32/SC4MP Installer.exe";
+					}
+				//} else if (userAgent.includes("mac")) {
+				//	downloadLink = "https://www.sc4mp.org/download/macos/SC4MP Installer.dmg";
+				//} else if (userAgent.includes("linux")) {
+				//	downloadLink = "https://www.sc4mp.org/download/linux/sc4mp-installer.sh";
+				} else {
+					downloadLink = "https://github.com/kegsmr/sc4mp-client/latest";
+				}
+		
+				// Redirect to the download link
+				window.location.href = downloadLink;
+		
+				// Optionally, redirect back to the original page after a delay
+				//setTimeout(() => {
+				//	window.location.href = "https://www.sc4mp.org";
+				//}, 5000);
+
+			});
+		});
+
+	</script>
+
 	<!-- core  -->
     <script src="assets/vendors/jquery/jquery-3.4.1.js"></script>
     <script src="assets/vendors/bootstrap/bootstrap.bundle.js"></script>
