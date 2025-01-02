@@ -20,6 +20,38 @@
 	<script type="text/javascript" src="assets/js/tabulator/tabulator.min.js"></script>
 	<!-- moment.js -->
 	<script type="text/javascript" src="assets/js/moment.js"></script>
+	<style>
+		.loading-spinner {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			/*background-color: rgba(255, 255, 255, 0.8); /* Optional semi-transparent background */
+			z-index: 10;
+		}
+		
+		.spinner {
+			border: 4px solid rgba(0, 0, 0, 0.1);
+			border-top: 4px solid #44667d;
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			animation: spin 1s linear infinite;
+		}
+		
+		@keyframes spin {
+			0% {
+				transform: rotate(0deg);
+			}
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+	</style>
 </head>
 <body data-spy="scroll" data-target=".navbar" data-offset="40" id="home">
 
@@ -93,8 +125,17 @@
         <div class="container text-center">
             <h6 class="display-4 has-line">SERVERS</h6>
 			<br>
-			<div id="server-list"></div>
+			<div id="server-list-wrapper" style="position: relative;">
+				<div id="loading-spinner" class="loading-spinner">
+					<div class="spinner"></div>
+				</div>
+				<div id="server-list" style="min-height: 200px;"></div>
+			</div>
 			<script>
+
+				const spinner = document.getElementById("loading-spinner");
+
+				spinner.display = "flex"
 
 				function format_filesize(size) {
 					if (size >= 10 ** 11) {
@@ -200,6 +241,8 @@
                     } else {
                         document.getElementsByClassName("server-list-subtitle")[0].innerHTML = "Currently <b>" + total_mayors_online + "</b> mayors online out of <b>" + total_mayors + "</b> total, across <b>" + total_servers + "</b> different servers.";
                     };
+
+					spinner.style.display = "none";
 
 				});
 
