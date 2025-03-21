@@ -258,11 +258,15 @@
 				let downloadLink = "";
 		
 				if (userAgent.includes("win")) {
-					if (userAgent.includes("wow64") || userAgent.includes("win64")) {
-						downloadLink = "https://www.sc4mp.org/download/windows/x64/SC4MP Installer.exe";
-					} else {
-						downloadLink = "https://www.sc4mp.org/download/windows/x32/SC4MP Installer.exe";
-					}
+
+					// AVs don't like the 64-bit installer for some reason, so for now it's commented out
+
+					// if (userAgent.includes("wow64") || userAgent.includes("win64")) {
+						// downloadLink = "https://www.sc4mp.org/download/windows/x64/SC4MP Installer.exe";
+					// } else {
+					downloadLink = "https://www.sc4mp.org/download/windows/x32/SC4MP Installer.exe";
+					// }
+
 				//} else if (userAgent.includes("mac")) {
 				//	downloadLink = "https://www.sc4mp.org/download/macos/SC4MP Installer.dmg";
 				//} else if (userAgent.includes("linux")) {
