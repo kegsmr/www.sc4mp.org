@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="An SC4MP server: its regions, cities and how to join.">
+	<meta name="author" content="SimCity 4 Multiplayer Project">
+
+	<title>Server - The SimCity 4 Multiplayer Project</title>
+
+	<!-- font icons -->
+	<link rel="stylesheet" href="../assets/vendors/themify-icons/css/themify-icons.css">
+
+	<!-- Bootstrap + Rubic main styles -->
+	<link rel="stylesheet" href="../assets/css/rubic.css">
+
+	<!-- favicon-->
+	<link rel="icon" type="image/x-icon" href="/assets/imgs/favicon.ico">
+
+	<!-- moment.js -->
+	<script type="text/javascript" src="../assets/js/moment.js"></script>
+
+	<style>
+
+		body {
+			background-color: #f8f9fa;
+		}
+
+		.server-section {
+			padding: 110px 0 60px 0;
+		}
+
+		.server-card {
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			border-radius: 8px;
+			background: white;
+			padding: 32px;
+		}
+
+		.server-description {
+			white-space: pre-line;
+		}
+
+		.server-stats {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px 32px;
+			margin: 20px 0;
+		}
+
+		.server-stats div {
+			min-width: 90px;
+		}
+
+		.server-stats strong {
+			display: block;
+			font-size: 1.5rem;
+			line-height: 1.2;
+		}
+
+		.server-stats span {
+			color: #6c757d;
+			font-size: 0.875rem;
+		}
+
+		/* Region gallery: the region view sits on a dark stage, like SC4's own */
+
+		.region-stage {
+			position: relative;
+			background: radial-gradient(ellipse at center, #2b3a4a 0%, #141c25 100%);
+			border-radius: 8px;
+			padding: 24px 64px;
+			min-height: 320px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+		}
+
+		.region-map {
+			position: relative;
+			display: inline-block;
+			max-width: 100%;
+			line-height: 0;
+		}
+
+		.region-map img {
+			max-width: 100%;
+			max-height: 70vh;
+			filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
+		}
+
+		.region-map svg {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+		}
+
+		.region-map polygon {
+			fill: rgba(255, 215, 76, 0.18);
+			stroke: #ffd74c;
+			stroke-width: 2px;
+			vector-effect: non-scaling-stroke;
+		}
+
+		.region-arrow {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 44px;
+			height: 44px;
+			border-radius: 50%;
+			border: 1px solid rgba(255, 255, 255, 0.35);
+			background: rgba(0, 0, 0, 0.35);
+			color: white;
+			font-size: 1.1rem;
+			cursor: pointer;
+			z-index: 2;
+		}
+
+		.region-arrow:hover, .region-arrow:focus {
+			background: rgba(0, 0, 0, 0.6);
+			border-color: white;
+			outline: none;
+		}
+
+		.region-arrow:focus-visible {
+			box-shadow: 0 0 0 3px #ffd74c;
+		}
+
+		.region-arrow.prev {
+			left: 12px;
+		}
+
+		.region-arrow.next {
+			right: 12px;
+		}
+
+		.region-message {
+			color: rgba(255, 255, 255, 0.75);
+			line-height: 1.5;
+		}
+
+		.region-caption {
+			display: flex;
+			justify-content: space-between;
+			align-items: baseline;
+			flex-wrap: wrap;
+			gap: 4px 16px;
+			margin: 16px 0 12px 0;
+		}
+
+		.region-caption h4 {
+			margin: 0;
+		}
+
+		.region-thumbs {
+			display: flex;
+			gap: 8px;
+			overflow-x: auto;
+			padding-bottom: 6px;
+		}
+
+		.region-thumb {
+			flex: 0 0 auto;
+			width: 120px;
+			border: 2px solid transparent;
+			border-radius: 6px;
+			background: #1d2733;
+			padding: 4px;
+			cursor: pointer;
+			text-align: center;
+		}
+
+		.region-thumb img {
+			width: 100%;
+			height: 56px;
+			object-fit: contain;
+		}
+
+		.region-thumb span {
+			display: block;
+			color: rgba(255, 255, 255, 0.85);
+			font-size: 0.75rem;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.region-thumb.active, .region-thumb:focus-visible {
+			border-color: #ffd74c;
+			outline: none;
+		}
+
+		.city-tooltip {
+			position: fixed;
+			z-index: 1050;
+			min-width: 200px;
+			max-width: 260px;
+			background: white;
+			border-radius: 6px;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+			padding: 12px 14px;
+			font-size: 0.875rem;
+			line-height: 1.4;
+			pointer-events: none;
+			display: none;
+		}
+
+		.city-tooltip h6 {
+			margin: 0 0 2px 0;
+			font-size: 1rem;
+		}
+
+		.city-tooltip table {
+			width: 100%;
+			margin-top: 8px;
+		}
+
+		.city-tooltip td:last-child {
+			text-align: right;
+			font-variant-numeric: tabular-nums;
+		}
+
+		.city-tooltip .rci {
+			display: flex;
+			height: 6px;
+			border-radius: 3px;
+			overflow: hidden;
+			margin-top: 6px;
+			background: #e9ecef;
+		}
+
+		.rci .r, .swatch.r { background: #4caf50; }
+		.rci .c, .swatch.c { background: #3f7fd8; }
+		.rci .i, .swatch.i { background: #e0a526; }
+
+		.swatch {
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			border-radius: 2px;
+			margin-right: 6px;
+		}
+
+		@media (max-width: 576px) {
+			.server-card {
+				padding: 20px;
+			}
+			.region-stage {
+				padding: 16px 8px 64px 8px;
+				min-height: 200px;
+			}
+			.region-arrow {
+				top: auto;
+				bottom: 10px;
+				transform: none;
+			}
+		}
+
+	</style>
+</head>
+<body>
+	<nav class="navbar page-navbar navbar-dark navbar-expand-md fixed-top affix">
+		<div class="container">
+			<a class="navbar-brand" href="/"><strong style="font-family: Tahoma; font-weight: 700;"><span style="color: #ffd74c">SC4</span><span style="color: #d03333;">MP</span></strong></a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item">
+						<a class="nav-link" href="/#servers">Servers</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="https://discord.gg/ErEj76JkzM" target="_blank">Discord</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link btn btn-primary text-light shadow-none ml-md-4" href="/#download">Download Launcher</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<section class="server-section">
+		<div class="container">
+
+			<div class="server-card mb-4" id="server">
+				<p class="text-muted my-4" id="server-status">Loading server...</p>
+			</div>
+
+			<div class="server-card" id="regions" style="display: none;">
+				<div class="region-stage" id="region-stage">
+					<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
+					<div class="region-map" id="region-map"></div>
+					<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
+				</div>
+				<div class="region-caption">
+					<h4 id="region-name"></h4>
+					<span class="text-muted" id="region-note"></span>
+				</div>
+				<div class="region-thumbs" id="region-thumbs" role="tablist" aria-label="Regions"></div>
+			</div>
+
+		</div>
+	</section>
+
+	<div class="city-tooltip" id="city-tooltip" role="tooltip"></div>
+
+	<script>
+
+		const SC4MP_API = 'https://api.sc4mp.org';
+		const SC4MP_INVITE = 'https://invite.sc4mp.org/';
+		const MAP_WIDTH = 1600;
+
+		const server_id = new URLSearchParams(window.location.search).get('id');
+
+		let regions = [];	// [name, info] pairs, by name
+		let current = -1;
+		let cities = [];	// the current map's cities, front to back
+
+		function api(path) {
+			return fetch(SC4MP_API + path).then(function(response) {
+				if (!response.ok) {
+					throw new Error(response.status);
+				}
+				return response.json();
+			});
+		}
+
+		function element(tag, attributes, text) {
+			const e = document.createElement(tag);
+			for (const name in (attributes || {})) {
+				e.setAttribute(name, attributes[name]);
+			}
+			if (text != null) {
+				e.textContent = text;
+			}
+			return e;
+		}
+
+		function format_filesize(size) {
+			const units = ["B", "KB", "MB", "GB"];
+			let i = 0;
+			while (size >= 1000 && i < units.length - 1) {
+				size /= 1000;
+				i++;
+			}
+			return (size >= 100 || i == 0 ? Math.round(size) : Math.round(size * 10) / 10) + units[i];
+		}
+
+		function format_number(n) {
+			return Number(n || 0).toLocaleString('en-US');
+		}
+
+		// ===== Server =====
+
+		function show_server(server) {
+
+			const info = server.info || {};
+			const stats = server.stats || {};
+			const card = document.getElementById('server');
+			card.innerHTML = '';
+
+			document.title = info.server_name + ' - The SimCity 4 Multiplayer Project';
+
+			card.appendChild(element('h3', {class: 'mb-1'}, info.server_name));
+			card.appendChild(element('p', {class: 'text-muted mb-3'}, server.host + ':' + server.port + (info.password_enabled ? ' · password required' : '')));
+
+			if (info.server_description) {
+				card.appendChild(element('p', {class: 'server-description'}, info.server_description));
+			}
+
+			if (info.server_url) {
+				const url = /^https?:\/\//i.test(info.server_url) ? info.server_url : 'http://' + info.server_url;
+				const p = element('p');
+				p.appendChild(element('a', {href: url, target: '_blank', rel: 'noopener'}, info.server_url));
+				card.appendChild(p);
+			}
+
+			const row = element('div', {class: 'server-stats'});
+			const stat = function(value, label) {
+				const d = element('div');
+				d.appendChild(element('strong', null, value));
+				d.appendChild(element('span', null, label));
+				row.appendChild(d);
+			};
+			stat(format_number(stats.stat_mayors), 'mayors');
+			stat(format_number(stats.stat_mayors_online), 'online now');
+			stat(Math.floor((stats.stat_claimed || 0) * 100) + '%', 'claimed');
+			stat(format_filesize(stats.stat_download || 0), 'download');
+			if (info.claim_duration) {
+				stat(info.claim_duration + ' days', 'claims last');
+			}
+			card.appendChild(row);
+
+			const actions = element('div', {class: 'd-flex flex-wrap align-items-center', style: 'gap: 12px;'});
+			actions.appendChild(element('a', {class: 'btn btn-primary', href: server.url}, 'Join'));
+			const invite = element('button', {type: 'button', class: 'btn btn-outline-primary'}, 'Copy invite link');
+			invite.addEventListener('click', function() {
+				navigator.clipboard.writeText(SC4MP_INVITE + server_id).then(function() {
+					invite.textContent = 'Invite link copied';
+					setTimeout(function() { invite.textContent = 'Copy invite link'; }, 2000);
+				});
+			});
+			actions.appendChild(invite);
+			card.appendChild(actions);
+
+			card.appendChild(element('p', {class: 'text-muted small mt-3 mb-0'}, 'Joining needs the SC4MP Launcher, which downloads the server\'s plugins and regions for you.'));
+		}
+
+		// ===== Regions =====
+
+		function show_regions(data) {
+
+			regions = Object.keys(data).sort().map(function(name) { return [name, data[name]]; }).filter(function(region) { return region[1].ready > 0; });
+
+			if (regions.length == 0) {
+				return;
+			}
+
+			document.getElementById('regions').style.display = '';
+
+			const thumbs = document.getElementById('region-thumbs');
+			regions.forEach(function(region, i) {
+				const thumb = element('button', {type: 'button', class: 'region-thumb', role: 'tab', 'aria-label': region[0]});
+				thumb.appendChild(element('img', {src: SC4MP_API + region[1].map + '?width=240', alt: '', loading: 'lazy'}));
+				thumb.appendChild(element('span', null, region[0]));
+				thumb.addEventListener('click', function() { show_region(i); });
+				thumbs.appendChild(thumb);
+			});
+
+			document.getElementById('region-prev').addEventListener('click', function() { show_region(current - 1); });
+			document.getElementById('region-next').addEventListener('click', function() { show_region(current + 1); });
+			document.addEventListener('keydown', function(e) {
+				if (e.target.closest && e.target.closest('input, textarea')) {
+					return;
+				}
+				if (e.key == 'ArrowLeft') {
+					show_region(current - 1);
+				} else if (e.key == 'ArrowRight') {
+					show_region(current + 1);
+				}
+			});
+
+			const prev = document.getElementById('region-prev');
+			const next = document.getElementById('region-next');
+			prev.style.display = next.style.display = (regions.length > 1) ? '' : 'none';
+
+			const hash = decodeURIComponent(window.location.hash.slice(1));
+			const start = regions.findIndex(function(region) { return region[0] == hash; });
+			show_region(start >= 0 ? start : 0);
+		}
+
+		function show_region(i) {
+
+			i = (i + regions.length) % regions.length;
+			if (i == current) {
+				return;
+			}
+			current = i;
+
+			const name = regions[i][0];
+			const region = regions[i][1];
+
+			history.replaceState(null, '', '#' + encodeURIComponent(name));
+
+			document.getElementById('region-name').textContent = name;
+			let note = format_number(region.cities) + (region.cities == 1 ? ' city' : ' cities');
+			if (region.ready < region.cities) {
+				note += ', ' + format_number(region.cities - region.ready) + ' not on the map yet';
+			}
+			if (regions.length > 1) {
+				note = 'Region ' + (i + 1) + ' of ' + regions.length + ' · ' + note;
+			}
+			document.getElementById('region-note').textContent = note;
+
+			document.querySelectorAll('.region-thumb').forEach(function(thumb, j) {
+				thumb.classList.toggle('active', j == i);
+				thumb.setAttribute('aria-selected', j == i);
+				if (j == i) {
+					thumb.scrollIntoView({block: 'nearest', inline: 'nearest'});
+				}
+			});
+
+			const map = document.getElementById('region-map');
+			map.innerHTML = '';
+			hide_city();
+			cities = [];
+
+			const img = element('img', {src: SC4MP_API + region.map + '?width=' + MAP_WIDTH, alt: 'Map of ' + name});
+			const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			svg.setAttribute('viewBox', '0 0 1 1');
+			svg.setAttribute('preserveAspectRatio', 'none');
+			map.appendChild(img);
+			map.appendChild(svg);
+
+			if (region.map_cities) {
+				api(region.map_cities).then(function(data) {
+					if (current == i) {
+						cities = data.cities;
+					}
+				}).catch(function() {});
+			}
+
+			map.onmousemove = function(e) {
+				const rect = img.getBoundingClientRect();
+				const city = city_at((e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height);
+				if (city) {
+					show_city(city, svg, e.clientX, e.clientY);
+				} else {
+					hide_city();
+				}
+			};
+			map.onclick = map.onmousemove;	// tapping a city on a phone
+			map.onmouseleave = hide_city;
+		}
+
+		// ===== Cities =====
+
+		function inside(x, y, outline) {
+			let result = false;
+			for (let i = 0, j = outline.length - 1; i < outline.length; j = i++) {
+				const [xi, yi] = outline[i];
+				const [xj, yj] = outline[j];
+				if ((yi > y) != (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
+					result = !result;
+				}
+			}
+			return result;
+		}
+
+		function city_at(x, y) {
+			return cities.find(function(city) { return inside(x, y, city.outline); });	// front to back, so the nearest city wins
+		}
+
+		let shown = null;
+
+		function show_city(city, svg, x, y) {
+
+			const tooltip = document.getElementById('city-tooltip');
+
+			if (city !== shown) {
+
+				shown = city;
+
+				svg.innerHTML = '';
+				const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+				polygon.setAttribute('points', city.outline.map(function(p) { return p.join(','); }).join(' '));
+				svg.appendChild(polygon);
+
+				tooltip.innerHTML = '';
+				const sizes = {1: 'Small', 2: 'Medium', 4: 'Large'};
+				const claimed = city.claimed !== false;	// maps without server stats count every city as claimed
+				const name = claimed ? (city.city_name || 'Unnamed city') : 'Unclaimed ' + (sizes[city.size] || '').toLowerCase() + ' tile';
+				tooltip.appendChild(element('h6', null, name));
+				if (claimed && city.mayor_name) {
+					tooltip.appendChild(element('div', {class: 'text-muted'}, 'Mayor ' + city.mayor_name));
+				}
+
+				const table = element('table');
+				const row = function(label, value, swatch) {
+					const tr = element('tr');
+					const td = element('td', null, label);
+					if (swatch) {
+						td.prepend(element('span', {class: 'swatch ' + swatch}));
+					}
+					tr.appendChild(td);
+					tr.appendChild(element('td', null, value));
+					table.appendChild(tr);
+				};
+
+				if (city.population != null) {
+					row('Population', format_number(city.population));
+					if (city.population > 0) {
+						row('Residential', format_number(city.residential_population), 'r');
+						row('Commercial', format_number(city.commercial_population), 'c');
+						row('Industrial', format_number(city.industrial_population), 'i');
+					}
+				}
+				if (claimed && city.total_funds != null) {
+					row('Funds', '§' + format_number(city.total_funds));
+				}
+				row('Tile', (sizes[city.size] || city.size + '×' + city.size) + ' (' + city.x + ', ' + city.y + ')');
+				if (claimed && city.modified) {
+					row('Last saved', moment(city.modified, 'YYYY-MM-DD HH:mm:ss').fromNow());
+				}
+				tooltip.appendChild(table);
+
+				if (city.population > 0) {
+					const bar = element('div', {class: 'rci'});
+					[['r', city.residential_population], ['c', city.commercial_population], ['i', city.industrial_population]].forEach(function(part) {
+						bar.appendChild(element('div', {class: part[0], style: 'width: ' + (100 * part[1] / city.population) + '%'}));
+					});
+					tooltip.appendChild(bar);
+				}
+
+				tooltip.style.display = 'block';
+			}
+
+			// Beside the cursor, kept on screen
+			const margin = 16;
+			let left = x + margin;
+			let top = y + margin;
+			if (left + tooltip.offsetWidth > window.innerWidth - 8) {
+				left = x - margin - tooltip.offsetWidth;
+			}
+			if (top + tooltip.offsetHeight > window.innerHeight - 8) {
+				top = y - margin - tooltip.offsetHeight;
+			}
+			tooltip.style.left = Math.max(8, left) + 'px';
+			tooltip.style.top = Math.max(8, top) + 'px';
+		}
+
+		function hide_city() {
+			shown = null;
+			document.getElementById('city-tooltip').style.display = 'none';
+			const svg = document.querySelector('#region-map svg');
+			if (svg) {
+				svg.innerHTML = '';
+			}
+		}
+
+		// ===== Load =====
+
+		if (!server_id) {
+			document.getElementById('server-status').textContent = 'No server was given. Pick one from the server list.';
+		} else {
+			api('/servers/' + encodeURIComponent(server_id)).then(function(server) {
+				show_server(server);
+				return api('/servers/' + encodeURIComponent(server_id) + '/regions').then(show_regions).catch(function() {});
+			}).catch(function() {
+				const status = document.getElementById('server-status');
+				status.textContent = 'This server isn\'t in the server list right now. It may be offline. ';
+				status.appendChild(element('a', {href: '/#servers'}, 'Back to the server list'));
+			});
+		}
+
+	</script>
+
+	<!-- core  -->
+	<script src="../assets/vendors/jquery/jquery-3.4.1.js"></script>
+	<script src="../assets/vendors/bootstrap/bootstrap.bundle.js"></script>
+
+</body>
+</html>
