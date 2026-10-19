@@ -4,10 +4,10 @@
 
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="description" content="An SC4MP server: its regions, cities and how to join.">
+	<meta name="description" content="An SC4MP server: its info, regions and cities.">
 	<meta name="author" content="SimCity 4 Multiplayer Project">
 
-	<title>Server - The SimCity 4 Multiplayer Project</title>
+	<title>The SimCity 4 Multiplayer Project - Server</title>
 
 	<!-- font icons -->
 	<link rel="stylesheet" href="../assets/vendors/themify-icons/css/themify-icons.css">
@@ -23,59 +23,73 @@
 
 	<style>
 
-		body {
-			background-color: #f8f9fa;
-		}
-
 		.server-section {
-			padding: 110px 0 60px 0;
+			padding-top: 140px;
 		}
 
-		.server-card {
-			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-			border-radius: 8px;
-			background: white;
-			padding: 32px;
+		.server-name {
+			font-size: 2.5rem;
+			word-wrap: break-word;
 		}
 
 		.server-description {
 			white-space: pre-line;
 		}
 
-		.server-stats {
+		/* Like the Info tab of the launcher's server details */
+		.server-info {
+			display: inline-block;
+			text-align: left;
+			margin: 10px auto 20px auto;
+		}
+
+		.server-info td {
+			padding: 2px 12px;
+		}
+
+		.server-info td:first-child {
+			font-weight: bold;
+		}
+
+		.invite-link {
+			max-width: 420px;
+			margin: 0 auto 30px auto;
+		}
+
+		.loading-spinner {
 			display: flex;
-			flex-wrap: wrap;
-			gap: 8px 32px;
-			margin: 20px 0;
+			justify-content: center;
+			padding: 40px 0;
 		}
 
-		.server-stats div {
-			min-width: 90px;
+		.spinner {
+			border: 4px solid rgba(0, 0, 0, 0.1);
+			border-top: 4px solid #79A9F5;
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			animation: spin 1s linear infinite;
 		}
 
-		.server-stats strong {
-			display: block;
-			font-size: 1.5rem;
-			line-height: 1.2;
+		@keyframes spin {
+			0% {
+				transform: rotate(0deg);
+			}
+			100% {
+				transform: rotate(360deg);
+			}
 		}
 
-		.server-stats span {
-			color: #6c757d;
-			font-size: 0.875rem;
-		}
-
-		/* Region gallery: the region view sits on a dark stage, like SC4's own */
+		/* Region maps */
 
 		.region-stage {
 			position: relative;
-			background: radial-gradient(ellipse at center, #2b3a4a 0%, #141c25 100%);
-			border-radius: 8px;
-			padding: 24px 64px;
-			min-height: 320px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			overflow: hidden;
+			padding: 20px 64px;
+			background: white;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 		}
 
 		.region-map {
@@ -88,7 +102,6 @@
 		.region-map img {
 			max-width: 100%;
 			max-height: 70vh;
-			filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
 		}
 
 		.region-map svg {
@@ -101,8 +114,8 @@
 		}
 
 		.region-map polygon {
-			fill: rgba(255, 215, 76, 0.18);
-			stroke: #ffd74c;
+			fill: rgba(255, 215, 76, 0.25);
+			stroke: #D03333;
 			stroke-width: 2px;
 			vector-effect: non-scaling-stroke;
 		}
@@ -113,67 +126,33 @@
 			transform: translateY(-50%);
 			width: 44px;
 			height: 44px;
+			padding: 0;
 			border-radius: 50%;
-			border: 1px solid rgba(255, 255, 255, 0.35);
-			background: rgba(0, 0, 0, 0.35);
-			color: white;
-			font-size: 1.1rem;
-			cursor: pointer;
 			z-index: 2;
 		}
 
-		.region-arrow:hover, .region-arrow:focus {
-			background: rgba(0, 0, 0, 0.6);
-			border-color: white;
-			outline: none;
-		}
-
-		.region-arrow:focus-visible {
-			box-shadow: 0 0 0 3px #ffd74c;
-		}
-
 		.region-arrow.prev {
-			left: 12px;
+			left: 10px;
 		}
 
 		.region-arrow.next {
-			right: 12px;
-		}
-
-		.region-message {
-			color: rgba(255, 255, 255, 0.75);
-			line-height: 1.5;
-		}
-
-		.region-caption {
-			display: flex;
-			justify-content: space-between;
-			align-items: baseline;
-			flex-wrap: wrap;
-			gap: 4px 16px;
-			margin: 16px 0 12px 0;
-		}
-
-		.region-caption h4 {
-			margin: 0;
+			right: 10px;
 		}
 
 		.region-thumbs {
 			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
 			gap: 8px;
-			overflow-x: auto;
-			padding-bottom: 6px;
+			margin-top: 10px;
 		}
 
 		.region-thumb {
-			flex: 0 0 auto;
 			width: 120px;
-			border: 2px solid transparent;
-			border-radius: 6px;
-			background: #1d2733;
 			padding: 4px;
+			border: 2px solid transparent;
+			background: white;
 			cursor: pointer;
-			text-align: center;
 		}
 
 		.region-thumb img {
@@ -184,76 +163,56 @@
 
 		.region-thumb span {
 			display: block;
-			color: rgba(255, 255, 255, 0.85);
 			font-size: 0.75rem;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
 
-		.region-thumb.active, .region-thumb:focus-visible {
-			border-color: #ffd74c;
-			outline: none;
+		.region-thumb.active {
+			border-color: #D03333;
 		}
 
+		/* City info, like the Cities tab of the launcher's server details */
 		.city-tooltip {
 			position: fixed;
 			z-index: 1050;
-			min-width: 200px;
-			max-width: 260px;
+			min-width: 210px;
+			max-width: 270px;
 			background: white;
-			border-radius: 6px;
-			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
-			padding: 12px 14px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+			padding: 10px 14px;
 			font-size: 0.875rem;
-			line-height: 1.4;
+			text-align: left;
 			pointer-events: none;
 			display: none;
 		}
 
 		.city-tooltip h6 {
-			margin: 0 0 2px 0;
-			font-size: 1rem;
+			margin: 0;
+			font-weight: bold;
 		}
 
 		.city-tooltip table {
 			width: 100%;
-			margin-top: 8px;
+			margin-top: 6px;
+		}
+
+		.city-tooltip td:first-child {
+			font-weight: bold;
+			padding-right: 12px;
 		}
 
 		.city-tooltip td:last-child {
 			text-align: right;
-			font-variant-numeric: tabular-nums;
-		}
-
-		.city-tooltip .rci {
-			display: flex;
-			height: 6px;
-			border-radius: 3px;
-			overflow: hidden;
-			margin-top: 6px;
-			background: #e9ecef;
-		}
-
-		.rci .r, .swatch.r { background: #4caf50; }
-		.rci .c, .swatch.c { background: #3f7fd8; }
-		.rci .i, .swatch.i { background: #e0a526; }
-
-		.swatch {
-			display: inline-block;
-			width: 8px;
-			height: 8px;
-			border-radius: 2px;
-			margin-right: 6px;
 		}
 
 		@media (max-width: 576px) {
-			.server-card {
-				padding: 20px;
+			.server-name {
+				font-size: 1.75rem;
 			}
 			.region-stage {
-				padding: 16px 8px 64px 8px;
-				min-height: 200px;
+				padding: 10px 10px 64px 10px;
 			}
 			.region-arrow {
 				top: auto;
@@ -274,48 +233,56 @@
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav ml-auto">
 					<li class="nav-item">
-						<a class="nav-link" href="/#servers">Servers</a>
-					</li>
-					<li class="nav-item">
 						<a class="nav-link" href="https://discord.gg/ErEj76JkzM" target="_blank">Discord</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link btn btn-primary text-light shadow-none ml-md-4" href="/#download">Download Launcher</a>
+						<a class="nav-link" href="https://reddit.com/r/sc4mp" target="_blank">Reddit</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="https://twitter.com/sc4multiplayer" target="_blank">Twitter</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="https://patreon.com/sc4mp" target="_blank">Patreon</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link btn btn-primary text-light shadow-none ml-md-4" href="/#download">Download Installer</a>
 					</li>
 				</ul>
 			</div>
 		</div>
 	</nav>
-
-	<section class="server-section">
-		<div class="container">
-
-			<div class="server-card mb-4" id="server">
-				<p class="text-muted my-4" id="server-status">Loading server...</p>
+	<section class="section server-section" id="server">
+		<div class="container text-center">
+			<div class="text-left mb-4">
+				<a class="btn btn-outline-primary btn-sm" href="/#servers"><span class="ti-arrow-left"></span>&ensp;Back to servers</a>
 			</div>
-
-			<div class="server-card" id="regions" style="display: none;">
-				<div class="region-stage" id="region-stage">
-					<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
-					<div class="region-map" id="region-map"></div>
-					<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
-				</div>
-				<div class="region-caption">
-					<h4 id="region-name"></h4>
-					<span class="text-muted" id="region-note"></span>
-				</div>
-				<div class="region-thumbs" id="region-thumbs" role="tablist" aria-label="Regions"></div>
-			</div>
-
+			<div id="server-loading" class="loading-spinner"><div class="spinner"></div></div>
+			<div id="server-info"></div>
 		</div>
 	</section>
+	<section class="section" id="regions" style="display: none;">
+		<div class="container text-center">
+			<h6 class="display-4 has-line">REGIONS</h6>
+			<br>
+			<div class="region-stage">
+				<button type="button" class="btn btn-outline-primary region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
+				<div class="region-map" id="region-map"></div>
+				<button type="button" class="btn btn-outline-primary region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
+			</div>
+			<br>
+			<h5 class="mb-1" id="region-name"></h5>
+			<p class="text-muted small" id="region-note"></p>
+			<div class="region-thumbs" id="region-thumbs" role="tablist" aria-label="Regions"></div>
+		</div>
+	</section>
+	<footer class="footer py-4 bg-dark text-light"> </footer>
 
 	<div class="city-tooltip" id="city-tooltip" role="tooltip"></div>
 
 	<script>
 
 		const SC4MP_API = 'https://api.sc4mp.org';
-		const SC4MP_INVITE = 'https://invite.sc4mp.org/';
+		const SC4MP_INVITES_DOMAIN = 'invite.sc4mp.org';
 		const MAP_WIDTH = 1600;
 
 		const server_id = new URLSearchParams(window.location.search).get('id');
@@ -344,18 +311,33 @@
 			return e;
 		}
 
+		// Same as the server list
 		function format_filesize(size) {
-			const units = ["B", "KB", "MB", "GB"];
-			let i = 0;
-			while (size >= 1000 && i < units.length - 1) {
-				size /= 1000;
-				i++;
+			if (size >= 10 ** 11) {
+				return ">99GB"
+			} else if (size >= 10 ** 10) {
+				return Math.floor(size / (10 ** 9)) + "GB"
+			} else if (size >= 10 ** 9) {
+				return Math.floor(size / (10 ** 8)) / 10 + "GB"
+			} else if (size >= 10 ** 7) {
+				return Math.floor(size / (10 ** 6)) + "MB"
+			} else if (size >= 10 ** 6) {
+				return Math.floor(size / (10 ** 5)) / 10 + "MB"
+			} else if (size >= 10 ** 4) {
+				return Math.floor(size / (10 ** 3)) + "KB"
+			} else if (size >= 10 ** 3) {
+				return Math.floor(size / (10 ** 2)) / 10 + "KB"
+			} else {
+				return size + "B"
 			}
-			return (size >= 100 || i == 0 ? Math.round(size) : Math.round(size * 10) / 10) + units[i];
 		}
 
 		function format_number(n) {
 			return Number(n || 0).toLocaleString('en-US');
+		}
+
+		function format_url(url) {
+			return /^https?:\/\//i.test(url) ? url : 'http://' + url;
 		}
 
 		// ===== Server =====
@@ -364,54 +346,81 @@
 
 			const info = server.info || {};
 			const stats = server.stats || {};
-			const card = document.getElementById('server');
-			card.innerHTML = '';
+			const box = document.getElementById('server-info');
 
-			document.title = info.server_name + ' - The SimCity 4 Multiplayer Project';
+			document.title = 'The SimCity 4 Multiplayer Project - ' + info.server_name;
 
-			card.appendChild(element('h3', {class: 'mb-1'}, info.server_name));
-			card.appendChild(element('p', {class: 'text-muted mb-3'}, server.host + ':' + server.port + (info.password_enabled ? ' · password required' : '')));
+			box.appendChild(element('h6', {class: 'display-4 has-line server-name'}, info.server_name));
 
 			if (info.server_description) {
-				card.appendChild(element('p', {class: 'server-description'}, info.server_description));
+				box.appendChild(element('p', {class: 'lead server-description'}, info.server_description));
 			}
-
 			if (info.server_url) {
-				const url = /^https?:\/\//i.test(info.server_url) ? info.server_url : 'http://' + info.server_url;
 				const p = element('p');
-				p.appendChild(element('a', {href: url, target: '_blank', rel: 'noopener'}, info.server_url));
-				card.appendChild(p);
+				p.appendChild(element('a', {href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, info.server_url));
+				box.appendChild(p);
 			}
 
-			const row = element('div', {class: 'server-stats'});
-			const stat = function(value, label) {
-				const d = element('div');
-				d.appendChild(element('strong', null, value));
-				d.appendChild(element('span', null, label));
-				row.appendChild(d);
+			// Same as the server list
+			let mayors = 'Currently <b>' + format_number(stats.stat_mayors_online) + '</b> ' + (stats.stat_mayors_online == 1 ? 'mayor' : 'mayors') + ' online out of <b>' + format_number(stats.stat_mayors) + '</b> total, with <b>' + Math.floor((stats.stat_claimed || 0) * 100) + '%</b> of the land claimed.';
+			const p = element('p', {class: 'mt-4'});
+			p.innerHTML = mayors;	// only numbers
+			box.appendChild(p);
+
+			// Same as the Info tab of the launcher's server details
+			const yes_no = function(yes, good) {
+				return [yes ? 'Yes' : 'No', (yes == good) ? 'text-success' : 'text-danger'];
 			};
-			stat(format_number(stats.stat_mayors), 'mayors');
-			stat(format_number(stats.stat_mayors_online), 'online now');
-			stat(Math.floor((stats.stat_claimed || 0) * 100) + '%', 'claimed');
-			stat(format_filesize(stats.stat_download || 0), 'download');
-			if (info.claim_duration) {
-				stat(info.claim_duration + ' days', 'claims last');
+			const rows = [
+				['Version', [server.version || info.server_version, '']],
+				['Public', yes_no(!info.password_enabled, true)],
+			];
+			if (info.private != null) {
+				rows.push(['Guests', yes_no(!info.private, true)]);
 			}
-			card.appendChild(row);
+			rows.push(['Custom plugins', yes_no(info.user_plugins_enabled, true)]);
+			if ('claim_duration' in info) {
+				rows.push(['Claim duration', info.claim_duration == null ? ['Forever', 'text-success'] : [info.claim_duration + ' days', '']]);
+				rows.push(['Claim limit', info.max_region_claims == null ? ['None', 'text-success'] : [info.max_region_claims + ' per region', '']]);
+			}
+			if (info.godmode_filter != null) {
+				rows.push(['Godmode claims', yes_no(!info.godmode_filter, true)]);
+			}
+			rows.push(['Download', [format_filesize(stats.stat_download || 0), '']]);
+			const table = element('table', {class: 'server-info'});
+			rows.forEach(function(row) {
+				const tr = element('tr');
+				tr.appendChild(element('td', null, row[0]));
+				tr.appendChild(element('td', {class: row[1][1]}, row[1][0]));
+				table.appendChild(tr);
+			});
+			box.appendChild(element('div')).appendChild(table);
 
-			const actions = element('div', {class: 'd-flex flex-wrap align-items-center', style: 'gap: 12px;'});
-			actions.appendChild(element('a', {class: 'btn btn-primary', href: server.url}, 'Join'));
-			const invite = element('button', {type: 'button', class: 'btn btn-outline-primary'}, 'Copy invite link');
-			invite.addEventListener('click', function() {
-				navigator.clipboard.writeText(SC4MP_INVITE + server_id).then(function() {
-					invite.textContent = 'Invite link copied';
-					setTimeout(function() { invite.textContent = 'Copy invite link'; }, 2000);
+			// Invite link
+			const invite_link = 'https://' + SC4MP_INVITES_DOMAIN + '/' + server_id;
+			const invite = element('div', {class: 'input-group input-group-sm invite-link'});
+			invite.appendChild(element('div', {class: 'input-group-prepend'})).appendChild(element('span', {class: 'input-group-text font-weight-bold'}, 'Invite link'));
+			const input = invite.appendChild(element('input', {class: 'form-control', type: 'text', readonly: '', value: invite_link, 'aria-label': 'Invite link'}));
+			input.addEventListener('focus', function() { input.select(); });
+			const copy = invite.appendChild(element('div', {class: 'input-group-append'})).appendChild(element('button', {class: 'btn btn-outline-primary', type: 'button'}, 'Copy'));
+			copy.addEventListener('click', function() {
+				navigator.clipboard.writeText(invite_link).then(function() {
+					copy.textContent = 'Copied';
+					setTimeout(function() { copy.textContent = 'Copy'; }, 2000);
 				});
 			});
-			actions.appendChild(invite);
-			card.appendChild(actions);
+			box.appendChild(invite);
 
-			card.appendChild(element('p', {class: 'text-muted small mt-3 mb-0'}, 'Joining needs the SC4MP Launcher, which downloads the server\'s plugins and regions for you.'));
+			// Join, and the server's website
+			const buttons = element('div');
+			buttons.appendChild(element('a', {class: 'btn btn-primary btn-lg m-2', href: server.url}, 'Join'));
+			if (info.server_url) {
+				buttons.appendChild(element('a', {class: 'btn btn-outline-primary btn-lg m-2', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, 'Website'));
+			}
+			box.appendChild(buttons);
+			const note = element('p', {class: 'small text-muted mt-3'}, 'Joining requires the SC4MP Launcher. ');
+			note.appendChild(element('a', {href: '/#download'}, 'Download it here.'));
+			box.appendChild(note);
 		}
 
 		// ===== Regions =====
@@ -435,8 +444,11 @@
 				thumbs.appendChild(thumb);
 			});
 
-			document.getElementById('region-prev').addEventListener('click', function() { show_region(current - 1); });
-			document.getElementById('region-next').addEventListener('click', function() { show_region(current + 1); });
+			const prev = document.getElementById('region-prev');
+			const next = document.getElementById('region-next');
+			prev.addEventListener('click', function() { show_region(current - 1); });
+			next.addEventListener('click', function() { show_region(current + 1); });
+			prev.style.display = next.style.display = (regions.length > 1) ? '' : 'none';
 			document.addEventListener('keydown', function(e) {
 				if (e.target.closest && e.target.closest('input, textarea')) {
 					return;
@@ -447,10 +459,6 @@
 					show_region(current + 1);
 				}
 			});
-
-			const prev = document.getElementById('region-prev');
-			const next = document.getElementById('region-next');
-			prev.style.display = next.style.display = (regions.length > 1) ? '' : 'none';
 
 			const hash = decodeURIComponent(window.location.hash.slice(1));
 			const start = regions.findIndex(function(region) { return region[0] == hash; });
@@ -473,19 +481,16 @@
 			document.getElementById('region-name').textContent = name;
 			let note = format_number(region.cities) + (region.cities == 1 ? ' city' : ' cities');
 			if (region.ready < region.cities) {
-				note += ', ' + format_number(region.cities - region.ready) + ' not on the map yet';
+				note += ' (' + format_number(region.cities - region.ready) + ' not on the map yet)';
 			}
 			if (regions.length > 1) {
-				note = 'Region ' + (i + 1) + ' of ' + regions.length + ' · ' + note;
+				note = 'Region ' + (i + 1) + ' of ' + regions.length + ', ' + note;
 			}
 			document.getElementById('region-note').textContent = note;
 
 			document.querySelectorAll('.region-thumb').forEach(function(thumb, j) {
 				thumb.classList.toggle('active', j == i);
 				thumb.setAttribute('aria-selected', j == i);
-				if (j == i) {
-					thumb.scrollIntoView({block: 'nearest', inline: 'nearest'});
-				}
 			});
 
 			const map = document.getElementById('region-map');
@@ -554,51 +559,33 @@
 				polygon.setAttribute('points', city.outline.map(function(p) { return p.join(','); }).join(' '));
 				svg.appendChild(polygon);
 
+				// Same as the Cities tab of the launcher's server details
 				tooltip.innerHTML = '';
-				const sizes = {1: 'Small', 2: 'Medium', 4: 'Large'};
-				const claimed = city.claimed !== false;	// maps without server stats count every city as claimed
-				const name = claimed ? (city.city_name || 'Unnamed city') : 'Unclaimed ' + (sizes[city.size] || '').toLowerCase() + ' tile';
-				tooltip.appendChild(element('h6', null, name));
-				if (claimed && city.mayor_name) {
-					tooltip.appendChild(element('div', {class: 'text-muted'}, 'Mayor ' + city.mayor_name));
+				tooltip.appendChild(element('h6', null, city.city_name || 'New City'));
+				if (city.claimed === false) {
+					tooltip.appendChild(element('div', {class: 'text-muted'}, 'Unclaimed'));
 				}
-
 				const table = element('table');
-				const row = function(label, value, swatch) {
+				const row = function(label, value) {
 					const tr = element('tr');
-					const td = element('td', null, label);
-					if (swatch) {
-						td.prepend(element('span', {class: 'swatch ' + swatch}));
-					}
-					tr.appendChild(td);
+					tr.appendChild(element('td', null, label));
 					tr.appendChild(element('td', null, value));
 					table.appendChild(tr);
 				};
-
-				if (city.population != null) {
-					row('Population', format_number(city.population));
-					if (city.population > 0) {
-						row('Residential', format_number(city.residential_population), 'r');
-						row('Commercial', format_number(city.commercial_population), 'c');
-						row('Industrial', format_number(city.industrial_population), 'i');
-					}
-				}
-				if (claimed && city.total_funds != null) {
+				const sizes = {1: 'Small', 2: 'Medium', 4: 'Large'};
+				row('Mayor', city.mayor_name || 'Defacto');
+				row('Size', sizes[city.size] || 'None');
+				if (city.mayor_rating != null) {
+					row('Rating', city.mayor_rating);
 					row('Funds', '§' + format_number(city.total_funds));
+					row('Residential', format_number(city.residential_population));
+					row('Commercial', format_number(city.commercial_population));
+					row('Industrial', format_number(city.industrial_population));
 				}
-				row('Tile', (sizes[city.size] || city.size + '×' + city.size) + ' (' + city.x + ', ' + city.y + ')');
-				if (claimed && city.modified) {
-					row('Last saved', moment(city.modified, 'YYYY-MM-DD HH:mm:ss').fromNow());
+				if (city.modified) {
+					row('Modified', moment(city.modified, 'YYYY-MM-DD HH:mm:ss').fromNow());
 				}
 				tooltip.appendChild(table);
-
-				if (city.population > 0) {
-					const bar = element('div', {class: 'rci'});
-					[['r', city.residential_population], ['c', city.commercial_population], ['i', city.industrial_population]].forEach(function(part) {
-						bar.appendChild(element('div', {class: part[0], style: 'width: ' + (100 * part[1] / city.population) + '%'}));
-					});
-					tooltip.appendChild(bar);
-				}
 
 				tooltip.style.display = 'block';
 			}
@@ -628,16 +615,21 @@
 
 		// ===== Load =====
 
+		function show_missing(message) {
+			document.getElementById('server-loading').style.display = 'none';
+			const p = document.getElementById('server-info').appendChild(element('p', {class: 'lead my-5'}, message + ' '));
+			p.appendChild(element('a', {href: '/#servers'}, 'See all servers.'));
+		}
+
 		if (!server_id) {
-			document.getElementById('server-status').textContent = 'No server was given. Pick one from the server list.';
+			show_missing('No server was chosen.');
 		} else {
 			api('/servers/' + encodeURIComponent(server_id)).then(function(server) {
+				document.getElementById('server-loading').style.display = 'none';
 				show_server(server);
 				return api('/servers/' + encodeURIComponent(server_id) + '/regions').then(show_regions).catch(function() {});
 			}).catch(function() {
-				const status = document.getElementById('server-status');
-				status.textContent = 'This server isn\'t in the server list right now. It may be offline. ';
-				status.appendChild(element('a', {href: '/#servers'}, 'Back to the server list'));
+				show_missing('This server isn\'t in the server list right now. It may be offline.');
 			});
 		}
 
