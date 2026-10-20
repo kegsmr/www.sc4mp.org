@@ -91,6 +91,12 @@
 			line-height: 1.7;
 		}
 
+		/* Blue, like the server's link in the launcher */
+		.server-url {
+			color: #0b63ce;
+			text-decoration: underline;
+		}
+
 		/* Like the Info tab of the launcher's server details */
 		.server-details td {
 			padding: 3px 0;
@@ -396,7 +402,7 @@
 			about.appendChild(element('p', {class: 'server-description'}, info.server_description || 'This server has no description.'));
 			if (info.server_url) {
 				const p = about.appendChild(element('p'));
-				p.appendChild(element('a', {href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, info.server_url));
+				p.appendChild(element('a', {class: 'server-url', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, info.server_url));
 			}
 
 			// Details, like the Info tab of the launcher's server details
