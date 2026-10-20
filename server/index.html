@@ -23,13 +23,62 @@
 
 	<style>
 
-		.server-section {
-			padding-top: 140px;
+		/* A shorter version of the home page's header */
+		.server-header {
+			background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), #efefef url(../assets/imgs/header.jpg);
+			background-size: cover;
+			background-position: center center;
+			color: white;
+			padding: 130px 0 60px 0;
+			text-align: center;
 		}
 
-		.server-name {
-			font-size: 2.5rem;
+		.server-header .back {
+			display: inline-block;
+			color: rgba(255, 255, 255, 0.8);
+			font-size: 0.9rem;
+			margin-bottom: 24px;
+		}
+
+		.server-header .back:hover {
+			color: white;
+			text-decoration: none;
+		}
+
+		.server-header h1 {
+			font-size: 46px;
+			font-weight: 100;
 			word-wrap: break-word;
+			margin-bottom: 12px;
+		}
+
+		.server-stats {
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 8px 40px;
+			margin: 8px 0 28px 0;
+		}
+
+		.server-stats strong {
+			display: block;
+			font-size: 1.75rem;
+			font-weight: 300;
+			line-height: 1.2;
+		}
+
+		.server-stats span {
+			color: rgba(255, 255, 255, 0.7);
+			font-size: 0.875rem;
+		}
+
+		.server-header .btn {
+			min-width: 140px;
+			margin: 6px;
+		}
+
+		.about-section {
+			padding: 60px 0;
 		}
 
 		.server-description {
@@ -37,23 +86,47 @@
 		}
 
 		/* Like the Info tab of the launcher's server details */
-		.server-info {
-			display: inline-block;
-			text-align: left;
-			margin: 10px auto 20px auto;
+		.server-details {
+			background: white;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			padding: 20px 24px;
 		}
 
-		.server-info td {
-			padding: 2px 12px;
+		.server-details dl {
+			margin: 0;
 		}
 
-		.server-info td:first-child {
-			font-weight: bold;
+		.server-details .row {
+			border-bottom: 1px solid #eef0f3;
+			padding: 6px 0;
+			margin: 0;
+		}
+
+		.server-details dt {
+			padding: 0;
+		}
+
+		.server-details dd {
+			padding: 0;
+			margin: 0;
+			text-align: right;
+		}
+
+		.yes {
+			color: #3c8a2e;
+		}
+
+		.no {
+			color: #D03333;
 		}
 
 		.invite-link {
-			max-width: 420px;
-			margin: 0 auto 30px auto;
+			margin-top: 16px;
+		}
+
+		.invite-link label {
+			font-weight: bold;
+			margin-bottom: 4px;
 		}
 
 		.loading-spinner {
@@ -63,7 +136,7 @@
 		}
 
 		.spinner {
-			border: 4px solid rgba(0, 0, 0, 0.1);
+			border: 4px solid rgba(255, 255, 255, 0.2);
 			border-top: 4px solid #79A9F5;
 			border-radius: 50%;
 			width: 40px;
@@ -82,13 +155,19 @@
 
 		/* Region maps */
 
+		.regions-section {
+			padding: 60px 0 80px 0;
+		}
+
 		.region-stage {
 			position: relative;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			padding: 20px 64px;
-			background: white;
+			padding: 28px 70px;
+			min-height: 320px;
+			background: radial-gradient(ellipse at center, #2b3a4a 0%, #141c25 100%);
+			border-radius: 4px;
 			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 		}
 
@@ -102,6 +181,7 @@
 		.region-map img {
 			max-width: 100%;
 			max-height: 70vh;
+			filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
 		}
 
 		.region-map svg {
@@ -115,7 +195,7 @@
 
 		.region-map polygon {
 			fill: rgba(255, 215, 76, 0.25);
-			stroke: #D03333;
+			stroke: #ffd74c;
 			stroke-width: 2px;
 			vector-effect: non-scaling-stroke;
 		}
@@ -124,53 +204,79 @@
 			position: absolute;
 			top: 50%;
 			transform: translateY(-50%);
-			width: 44px;
-			height: 44px;
+			width: 48px;
+			height: 48px;
 			padding: 0;
+			border: 1px solid rgba(255, 255, 255, 0.35);
 			border-radius: 50%;
+			background: rgba(0, 0, 0, 0.35);
+			color: white;
+			font-size: 1.1rem;
+			cursor: pointer;
 			z-index: 2;
 		}
 
+		.region-arrow:hover, .region-arrow:focus {
+			background: rgba(0, 0, 0, 0.6);
+			border-color: white;
+			outline: none;
+		}
+
+		.region-arrow:focus-visible {
+			box-shadow: 0 0 0 3px #ffd74c;
+		}
+
 		.region-arrow.prev {
-			left: 10px;
+			left: 12px;
 		}
 
 		.region-arrow.next {
-			right: 10px;
+			right: 12px;
+		}
+
+		.region-caption {
+			margin: 24px 0 16px 0;
+		}
+
+		.region-caption h5 {
+			margin-bottom: 2px;
 		}
 
 		.region-thumbs {
 			display: flex;
 			justify-content: center;
 			flex-wrap: wrap;
-			gap: 8px;
-			margin-top: 10px;
+			gap: 10px;
 		}
 
 		.region-thumb {
 			width: 120px;
 			padding: 4px;
 			border: 2px solid transparent;
-			background: white;
+			border-radius: 4px;
+			background: #1d2733;
 			cursor: pointer;
 		}
 
 		.region-thumb img {
 			width: 100%;
-			height: 56px;
+			height: 52px;
 			object-fit: contain;
 		}
 
 		.region-thumb span {
 			display: block;
+			margin-top: 4px;
 			font-size: 0.75rem;
+			color: rgba(255, 255, 255, 0.85);
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
 
-		.region-thumb.active {
-			border-color: #D03333;
+		.region-thumb.active, .region-thumb:focus-visible {
+			border-color: #ffd74c;
+			outline: none;
 		}
 
 		/* City info, like the Cities tab of the launcher's server details */
@@ -207,17 +313,48 @@
 			text-align: right;
 		}
 
+		.rci {
+			display: flex;
+			height: 6px;
+			border-radius: 3px;
+			overflow: hidden;
+			margin-top: 6px;
+			background: #e9ecef;
+		}
+
+		.rci .r, .swatch.r { background: #4caf50; }
+		.rci .c, .swatch.c { background: #3f7fd8; }
+		.rci .i, .swatch.i { background: #e0a526; }
+
+		.swatch {
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			border-radius: 2px;
+			margin-right: 6px;
+		}
+
 		@media (max-width: 576px) {
-			.server-name {
-				font-size: 1.75rem;
+			.server-header {
+				padding: 100px 0 40px 0;
+			}
+			.server-header h1 {
+				font-size: 32px;
 			}
 			.region-stage {
-				padding: 10px 10px 64px 10px;
+				padding: 16px 8px 64px 8px;
+				min-height: 200px;
 			}
 			.region-arrow {
 				top: auto;
 				bottom: 10px;
 				transform: none;
+			}
+			.region-arrow.prev {
+				left: calc(50% - 56px);
+			}
+			.region-arrow.next {
+				right: calc(50% - 56px);
 			}
 		}
 
@@ -251,27 +388,36 @@
 			</div>
 		</div>
 	</nav>
-	<section class="section server-section" id="server">
-		<div class="container text-center">
-			<div class="text-left mb-4">
-				<a class="btn btn-outline-primary btn-sm" href="/#servers"><span class="ti-arrow-left"></span>&ensp;Back to servers</a>
-			</div>
+	<header class="server-header">
+		<div class="container">
+			<a class="back" href="/#servers"><span class="ti-arrow-left"></span>&ensp;Back to servers</a>
 			<div id="server-loading" class="loading-spinner"><div class="spinner"></div></div>
-			<div id="server-info"></div>
+			<div id="server-header"></div>
+		</div>
+	</header>
+	<section class="about-section bg-light" id="server" style="display: none;">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-7 mb-4" id="server-about"></div>
+				<div class="col-lg-5">
+					<div class="server-details" id="server-details"></div>
+				</div>
+			</div>
 		</div>
 	</section>
-	<section class="section" id="regions" style="display: none;">
+	<section class="regions-section" id="regions" style="display: none;">
 		<div class="container text-center">
 			<h6 class="display-4 has-line">REGIONS</h6>
 			<br>
 			<div class="region-stage">
-				<button type="button" class="btn btn-outline-primary region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
+				<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
 				<div class="region-map" id="region-map"></div>
-				<button type="button" class="btn btn-outline-primary region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
+				<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
 			</div>
-			<br>
-			<h5 class="mb-1" id="region-name"></h5>
-			<p class="text-muted small" id="region-note"></p>
+			<div class="region-caption">
+				<h5 id="region-name"></h5>
+				<span class="text-muted small" id="region-note"></span>
+			</div>
 			<div class="region-thumbs" id="region-thumbs" role="tablist" aria-label="Regions"></div>
 		</div>
 	</section>
@@ -346,30 +492,44 @@
 
 			const info = server.info || {};
 			const stats = server.stats || {};
-			const box = document.getElementById('server-info');
 
 			document.title = 'The SimCity 4 Multiplayer Project - ' + info.server_name;
 
-			box.appendChild(element('h6', {class: 'display-4 has-line server-name'}, info.server_name));
-
-			if (info.server_description) {
-				box.appendChild(element('p', {class: 'lead server-description'}, info.server_description));
-			}
+			// Header: name, mayors (like the server list), Join and the server's website
+			const header = document.getElementById('server-header');
+			header.appendChild(element('h1', null, info.server_name));
+			const counts = header.appendChild(element('div', {class: 'server-stats'}));	// the server list's columns
+			[
+				[format_number(stats.stat_mayors), 'Mayors'],
+				[format_number(stats.stat_mayors_online), 'Online'],
+				[Math.floor((stats.stat_claimed || 0) * 100) + '%', 'Claimed'],
+				[format_filesize(stats.stat_download || 0), 'Download'],
+			].forEach(function(stat) {
+				const d = counts.appendChild(element('div'));
+				d.appendChild(element('strong', null, stat[0]));
+				d.appendChild(element('span', null, stat[1]));
+			});
+			header.appendChild(element('a', {class: 'btn btn-primary btn-lg', href: server.url}, 'Join'));
 			if (info.server_url) {
-				const p = element('p');
-				p.appendChild(element('a', {href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, info.server_url));
-				box.appendChild(p);
+				header.appendChild(element('a', {class: 'btn btn-outline-light btn-lg btn-flat', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, 'Website'));
 			}
 
-			// Same as the server list
-			let mayors = 'Currently <b>' + format_number(stats.stat_mayors_online) + '</b> ' + (stats.stat_mayors_online == 1 ? 'mayor' : 'mayors') + ' online out of <b>' + format_number(stats.stat_mayors) + '</b> total, with <b>' + Math.floor((stats.stat_claimed || 0) * 100) + '%</b> of the land claimed.';
-			const p = element('p', {class: 'mt-4'});
-			p.innerHTML = mayors;	// only numbers
-			box.appendChild(p);
+			// Description, and the server's website (like the launcher)
+			const about = document.getElementById('server-about');
+			about.appendChild(element('h5', {class: 'font-weight-bold'}, 'About'));
+			about.appendChild(element('p', {class: 'server-description'}, info.server_description || 'This server has no description.'));
+			if (info.server_url) {
+				const p = about.appendChild(element('p'));
+				p.appendChild(element('a', {href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, info.server_url));
+			}
+			const note = about.appendChild(element('p', {class: 'small text-muted'}, 'Joining requires the SC4MP Launcher. '));
+			note.appendChild(element('a', {href: '/#download'}, 'Download it here.'));
 
-			// Same as the Info tab of the launcher's server details
+			// Details, like the Info tab of the launcher's server details
+			const details = document.getElementById('server-details');
+			details.appendChild(element('h5', {class: 'font-weight-bold mb-2'}, 'Info'));
 			const yes_no = function(yes, good) {
-				return [yes ? 'Yes' : 'No', (yes == good) ? 'text-success' : 'text-danger'];
+				return [yes ? 'Yes' : 'No', (yes == good) ? 'yes' : 'no'];
 			};
 			const rows = [
 				['Version', [server.version || info.server_version, '']],
@@ -380,47 +540,35 @@
 			}
 			rows.push(['Custom plugins', yes_no(info.user_plugins_enabled, true)]);
 			if ('claim_duration' in info) {
-				rows.push(['Claim duration', info.claim_duration == null ? ['Forever', 'text-success'] : [info.claim_duration + ' days', '']]);
-				rows.push(['Claim limit', info.max_region_claims == null ? ['None', 'text-success'] : [info.max_region_claims + ' per region', '']]);
+				rows.push(['Claim duration', info.claim_duration == null ? ['Forever', 'yes'] : [info.claim_duration + ' days', '']]);
+				rows.push(['Claim limit', info.max_region_claims == null ? ['None', 'yes'] : [info.max_region_claims + ' per region', '']]);
 			}
 			if (info.godmode_filter != null) {
 				rows.push(['Godmode claims', yes_no(!info.godmode_filter, true)]);
 			}
-			rows.push(['Download', [format_filesize(stats.stat_download || 0), '']]);
-			const table = element('table', {class: 'server-info'});
+			const dl = details.appendChild(element('dl'));
 			rows.forEach(function(row) {
-				const tr = element('tr');
-				tr.appendChild(element('td', null, row[0]));
-				tr.appendChild(element('td', {class: row[1][1]}, row[1][0]));
-				table.appendChild(tr);
+				const r = dl.appendChild(element('div', {class: 'row'}));
+				r.appendChild(element('dt', {class: 'col-6'}, row[0]));
+				r.appendChild(element('dd', {class: 'col-6 ' + row[1][1]}, row[1][0]));
 			});
-			box.appendChild(element('div')).appendChild(table);
 
 			// Invite link
 			const invite_link = 'https://' + SC4MP_INVITES_DOMAIN + '/' + server_id;
-			const invite = element('div', {class: 'input-group input-group-sm invite-link'});
-			invite.appendChild(element('div', {class: 'input-group-prepend'})).appendChild(element('span', {class: 'input-group-text font-weight-bold'}, 'Invite link'));
-			const input = invite.appendChild(element('input', {class: 'form-control', type: 'text', readonly: '', value: invite_link, 'aria-label': 'Invite link'}));
+			const invite = details.appendChild(element('div', {class: 'invite-link'}));
+			invite.appendChild(element('label', {for: 'invite-link'}, 'Invite link'));
+			const group = invite.appendChild(element('div', {class: 'input-group'}));
+			const input = group.appendChild(element('input', {class: 'form-control', id: 'invite-link', type: 'text', readonly: '', value: invite_link}));
 			input.addEventListener('focus', function() { input.select(); });
-			const copy = invite.appendChild(element('div', {class: 'input-group-append'})).appendChild(element('button', {class: 'btn btn-outline-primary', type: 'button'}, 'Copy'));
+			const copy = group.appendChild(element('div', {class: 'input-group-append'})).appendChild(element('button', {class: 'btn btn-outline-primary', type: 'button'}, 'Copy'));
 			copy.addEventListener('click', function() {
 				navigator.clipboard.writeText(invite_link).then(function() {
 					copy.textContent = 'Copied';
 					setTimeout(function() { copy.textContent = 'Copy'; }, 2000);
 				});
 			});
-			box.appendChild(invite);
 
-			// Join, and the server's website
-			const buttons = element('div');
-			buttons.appendChild(element('a', {class: 'btn btn-primary btn-lg m-2', href: server.url}, 'Join'));
-			if (info.server_url) {
-				buttons.appendChild(element('a', {class: 'btn btn-outline-primary btn-lg m-2', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, 'Website'));
-			}
-			box.appendChild(buttons);
-			const note = element('p', {class: 'small text-muted mt-3'}, 'Joining requires the SC4MP Launcher. ');
-			note.appendChild(element('a', {href: '/#download'}, 'Download it here.'));
-			box.appendChild(note);
+			document.getElementById('server').style.display = '';
 		}
 
 		// ===== Regions =====
@@ -566,9 +714,12 @@
 					tooltip.appendChild(element('div', {class: 'text-muted'}, 'Unclaimed'));
 				}
 				const table = element('table');
-				const row = function(label, value) {
+				const row = function(label, value, swatch) {
 					const tr = element('tr');
-					tr.appendChild(element('td', null, label));
+					const td = tr.appendChild(element('td', null, label));
+					if (swatch) {
+						td.prepend(element('span', {class: 'swatch ' + swatch}));
+					}
 					tr.appendChild(element('td', null, value));
 					table.appendChild(tr);
 				};
@@ -578,14 +729,22 @@
 				if (city.mayor_rating != null) {
 					row('Rating', city.mayor_rating);
 					row('Funds', '§' + format_number(city.total_funds));
-					row('Residential', format_number(city.residential_population));
-					row('Commercial', format_number(city.commercial_population));
-					row('Industrial', format_number(city.industrial_population));
+					row('Residential', format_number(city.residential_population), 'r');
+					row('Commercial', format_number(city.commercial_population), 'c');
+					row('Industrial', format_number(city.industrial_population), 'i');
 				}
 				if (city.modified) {
 					row('Modified', moment(city.modified, 'YYYY-MM-DD HH:mm:ss').fromNow());
 				}
 				tooltip.appendChild(table);
+
+				const population = (city.residential_population || 0) + (city.commercial_population || 0) + (city.industrial_population || 0);
+				if (population > 0) {
+					const bar = tooltip.appendChild(element('div', {class: 'rci'}));
+					[['r', city.residential_population], ['c', city.commercial_population], ['i', city.industrial_population]].forEach(function(part) {
+						bar.appendChild(element('div', {class: part[0], style: 'width: ' + (100 * (part[1] || 0) / population) + '%'}));
+					});
+				}
 
 				tooltip.style.display = 'block';
 			}
@@ -617,8 +776,8 @@
 
 		function show_missing(message) {
 			document.getElementById('server-loading').style.display = 'none';
-			const p = document.getElementById('server-info').appendChild(element('p', {class: 'lead my-5'}, message + ' '));
-			p.appendChild(element('a', {href: '/#servers'}, 'See all servers.'));
+			const p = document.getElementById('server-header').appendChild(element('p', {class: 'lead my-4'}, message + ' '));
+			p.appendChild(element('a', {href: '/#servers', class: 'text-white', style: 'text-decoration: underline;'}, 'See all servers.'));
 		}
 
 		if (!server_id) {
