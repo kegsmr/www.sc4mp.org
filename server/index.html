@@ -53,6 +53,24 @@
 			margin-bottom: 12px;
 		}
 
+		.server-lock {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			margin-bottom: 14px;
+			padding: 4px 12px;
+			border: 1px solid rgba(255, 215, 76, 0.6);
+			border-radius: 20px;
+			color: #ffd74c;
+			font-size: 0.9rem;
+		}
+
+		.lock-icon {
+			width: 11px;
+			height: 15px;
+			vertical-align: -2px;
+		}
+
 		.server-stats {
 			display: flex;
 			justify-content: center;
@@ -532,6 +550,11 @@
 			// Header: name, mayors (like the server list), Join and the server's website
 			const header = document.getElementById('server-header');
 			header.appendChild(element('h1', null, info.server_name));
+			if (info.password_enabled) {	// the server list's lock
+				const lock = header.appendChild(element('div', {class: 'server-lock'}));
+				lock.appendChild(element('img', {src: '../assets/imgs/lock-icon.png', alt: '', width: 15, height: 20}));
+				lock.appendChild(document.createTextNode('Password required'));
+			}
 			const counts = header.appendChild(element('div', {class: 'server-stats'}));	// the server list's columns
 			[
 				[format_number(stats.stat_mayors), 'Mayors'],
@@ -586,7 +609,10 @@
 			rows.forEach(function(row) {
 				const r = dl.appendChild(element('div', {class: 'row'}));
 				r.appendChild(element('dt', {class: 'col-6'}, row[0]));
-				r.appendChild(element('dd', {class: 'col-6 ' + row[1][1]}, row[1][0]));
+				const dd = r.appendChild(element('dd', {class: 'col-6 ' + row[1][1]}, row[1][0]));
+				if (row[0] == 'Public' && info.password_enabled) {
+					dd.prepend(element('img', {class: 'lock-icon mr-2', src: '../assets/imgs/lock-icon.png', alt: ''}));
+				}
 			});
 
 			// Invite link
