@@ -375,7 +375,7 @@
 
 			document.title = 'The SimCity 4 Multiplayer Project - ' + info.server_name;
 
-			// Header: name, mayors (like the server list), Join and the server's website
+			// Header: name, mayors (like the server list) and Join
 			const header = document.getElementById('server-header');
 			const h1 = header.appendChild(element('h1', null, info.server_name));
 			if (info.password_enabled) {	// the server list's lock
@@ -387,9 +387,6 @@
 			const counts = header.appendChild(element('p', {class: 'counts'}));
 			counts.innerHTML = 'Currently <b>' + format_number(online) + '</b> ' + (online == 1 ? 'mayor' : 'mayors') + ' online out of <b>' + format_number(stats.stat_mayors) + '</b> total, with <b>' + Math.floor((stats.stat_claimed || 0) * 100) + '%</b> claimed. Download size <b>' + format_filesize(stats.stat_download || 0) + '</b>.';	// only numbers
 			header.appendChild(element('a', {class: 'btn btn-primary btn-lg', href: server.url}, 'Join'));
-			if (info.server_url) {
-				header.appendChild(element('a', {class: 'btn btn-outline-light btn-lg', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, 'Website'));
-			}
 			const note = header.appendChild(element('p', {class: 'launcher-note'}, 'Joining requires the SC4MP Launcher. '));
 			note.appendChild(element('a', {href: '/#download'}, 'Download it here.'));
 
