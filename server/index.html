@@ -29,15 +29,16 @@
 			background-size: cover;
 			background-position: center center;
 			color: white;
-			padding: 130px 0 60px 0;
+			padding: 100px 0 56px 0;
 			text-align: center;
 		}
 
 		.server-header .back {
-			display: inline-block;
-			color: rgba(255, 255, 255, 0.8);
+			display: block;
+			text-align: left;
+			color: rgba(255, 255, 255, 0.75);
 			font-size: 0.9rem;
-			margin-bottom: 24px;
+			margin-bottom: 28px;
 		}
 
 		.server-header .back:hover {
@@ -73,16 +74,41 @@
 		}
 
 		.server-header .btn {
-			min-width: 140px;
+			width: 160px;
 			margin: 6px;
+			box-shadow: none;
+		}
+
+		.server-header .launcher-note {
+			margin: 14px 0 0 0;
+			font-size: 0.85rem;
+			color: rgba(255, 255, 255, 0.7);
+		}
+
+		.server-header .launcher-note a {
+			color: white;
+			text-decoration: underline;
 		}
 
 		.about-section {
-			padding: 60px 0;
+			padding: 48px 0 56px 0;
+		}
+
+		.server-about {
+			padding-top: 20px;
 		}
 
 		.server-description {
 			white-space: pre-line;
+			font-size: 1.05rem;
+			font-weight: 400;
+			color: #333;
+			line-height: 1.7;
+		}
+
+		.server-website {
+			color: #D03333;
+			font-weight: 500;
 		}
 
 		/* Like the Info tab of the launcher's server details */
@@ -156,7 +182,7 @@
 		/* Region maps */
 
 		.regions-section {
-			padding: 60px 0 80px 0;
+			padding: 48px 0 72px 0;
 		}
 
 		.region-stage {
@@ -356,6 +382,15 @@
 			.region-arrow.next {
 				right: calc(50% - 56px);
 			}
+			.region-thumbs {
+				flex-wrap: nowrap;
+				justify-content: flex-start;
+				overflow-x: auto;
+				padding-bottom: 6px;
+			}
+			.region-thumb {
+				flex: 0 0 auto;
+			}
 		}
 
 	</style>
@@ -398,7 +433,7 @@
 	<section class="about-section bg-light" id="server" style="display: none;">
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-7 mb-4" id="server-about"></div>
+				<div class="col-lg-7 mb-4 server-about" id="server-about"></div>
 				<div class="col-lg-5">
 					<div class="server-details" id="server-details"></div>
 				</div>
@@ -408,7 +443,6 @@
 	<section class="regions-section" id="regions" style="display: none;">
 		<div class="container text-center">
 			<h6 class="display-4 has-line">REGIONS</h6>
-			<br>
 			<div class="region-stage">
 				<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
 				<div class="region-map" id="region-map"></div>
@@ -511,8 +545,10 @@
 			});
 			header.appendChild(element('a', {class: 'btn btn-primary btn-lg', href: server.url}, 'Join'));
 			if (info.server_url) {
-				header.appendChild(element('a', {class: 'btn btn-outline-light btn-lg btn-flat', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, 'Website'));
+				header.appendChild(element('a', {class: 'btn btn-outline-light btn-lg', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, 'Website'));
 			}
+			const note = header.appendChild(element('p', {class: 'launcher-note'}, 'Joining requires the SC4MP Launcher. '));
+			note.appendChild(element('a', {href: '/#download'}, 'Download it here.'));
 
 			// Description, and the server's website (like the launcher)
 			const about = document.getElementById('server-about');
@@ -520,10 +556,10 @@
 			about.appendChild(element('p', {class: 'server-description'}, info.server_description || 'This server has no description.'));
 			if (info.server_url) {
 				const p = about.appendChild(element('p'));
-				p.appendChild(element('a', {href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, info.server_url));
+				const link = p.appendChild(element('a', {class: 'server-website', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}));
+				link.appendChild(element('span', {class: 'ti-link'}));
+				link.appendChild(document.createTextNode('\u2002' + info.server_url));
 			}
-			const note = about.appendChild(element('p', {class: 'small text-muted'}, 'Joining requires the SC4MP Launcher. '));
-			note.appendChild(element('a', {href: '/#download'}, 'Download it here.'));
 
 			// Details, like the Info tab of the launcher's server details
 			const details = document.getElementById('server-details');
@@ -639,6 +675,9 @@
 			document.querySelectorAll('.region-thumb').forEach(function(thumb, j) {
 				thumb.classList.toggle('active', j == i);
 				thumb.setAttribute('aria-selected', j == i);
+				if (j == i && thumb.parentNode.scrollWidth > thumb.parentNode.clientWidth) {	// keep it in view when the strip scrolls (phones)
+					thumb.parentNode.scrollLeft = thumb.offsetLeft - thumb.parentNode.offsetLeft - (thumb.parentNode.clientWidth - thumb.offsetWidth) / 2;
+				}
 			});
 
 			const map = document.getElementById('region-map');
