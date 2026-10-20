@@ -152,7 +152,7 @@
 		/* Region maps, with a tab for each region like the launcher */
 
 		.regions-section {
-			padding: 48px 0 72px 0;
+			padding: 40px 0 64px 0;
 		}
 
 		.region-tabs {
@@ -172,6 +172,11 @@
 			color: #D03333;
 		}
 
+		.region-stage {
+			position: relative;
+			padding: 0 56px;
+		}
+
 		.region-map {
 			position: relative;
 			display: inline-block;
@@ -182,6 +187,50 @@
 		.region-map img {
 			max-width: 100%;
 			max-height: 70vh;
+			transition: opacity 0.25s;
+		}
+
+		.region-map.loading img {
+			opacity: 0.4;	/* the old map, until the next one has loaded */
+		}
+
+		.region-map img.shown {
+			animation: map-in 0.25s;
+		}
+
+		@keyframes map-in {
+			from {
+				opacity: 0.4;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+
+		.region-arrow {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 40px;
+			height: 40px;
+			padding: 0;
+			border: 1px solid #ccc;
+			border-radius: 50%;
+			background: white;
+			color: #555;
+		}
+
+		.region-arrow:hover {
+			color: #D03333;
+			border-color: #D03333;
+		}
+
+		.region-arrow.prev {
+			left: 0;
+		}
+
+		.region-arrow.next {
+			right: 0;
 		}
 
 		.region-map svg {
@@ -200,12 +249,6 @@
 			vector-effect: non-scaling-stroke;
 		}
 
-		.region-nav {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-top: 16px;
-		}
 
 		/* City info, like the Cities tab of the launcher's server details */
 		.city-tooltip {
@@ -245,6 +288,20 @@
 			}
 			.server-header h1 {
 				font-size: 32px;
+			}
+			.region-stage {
+				padding: 0 0 52px 0;
+			}
+			.region-arrow {
+				top: auto;
+				bottom: 0;
+				transform: none;
+			}
+			.region-arrow.prev {
+				left: calc(50% - 48px);
+			}
+			.region-arrow.next {
+				right: calc(50% - 48px);
 			}
 		}
 
@@ -297,14 +354,13 @@
 	</section>
 	<section class="regions-section" id="regions" style="display: none;">
 		<div class="container text-center">
-			<h6 class="display-4 has-line">REGIONS</h6>
 			<ul class="nav nav-tabs region-tabs" id="region-tabs" role="tablist" aria-label="Regions"></ul>
-			<div class="region-map" id="region-map"></div>
-			<div class="region-nav">
-				<button type="button" class="btn btn-outline-primary btn-sm" id="region-prev"><span class="ti-angle-left"></span> Previous</button>
-				<span class="text-muted small" id="region-note"></span>
-				<button type="button" class="btn btn-outline-primary btn-sm" id="region-next">Next <span class="ti-angle-right"></span></button>
+			<div class="region-stage">
+				<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
+				<div class="region-map" id="region-map"></div>
+				<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
 			</div>
+			<p class="text-muted small mt-3 mb-0" id="region-note"></p>
 		</div>
 	</section>
 	<footer class="footer py-4 bg-dark text-light"> </footer>
@@ -398,7 +454,6 @@
 
 			// Description, and the server's website (like the launcher)
 			const about = document.getElementById('server-about');
-			about.appendChild(element('h5', {class: 'font-weight-bold'}, 'About'));
 			about.appendChild(element('p', {class: 'server-description'}, info.server_description || 'This server has no description.'));
 			if (info.server_url) {
 				const p = about.appendChild(element('p'));
@@ -492,6 +547,10 @@
 			show_region(start >= 0 ? start : 0);
 		}
 
+		function map_url(region) {
+			return SC4MP_API + region.map + '?width=' + MAP_WIDTH;
+		}
+
 		function show_region(i) {
 
 			i = (i + regions.length) % regions.length;
@@ -509,9 +568,6 @@
 			if (region.ready < region.cities) {
 				note += ' (' + format_number(region.cities - region.ready) + ' not on the map yet)';
 			}
-			if (regions.length > 1) {
-				note = name + ' (' + (i + 1) + ' of ' + regions.length + '), ' + note;
-			}
 			document.getElementById('region-note').textContent = note;
 
 			document.querySelectorAll('#region-tabs .nav-link').forEach(function(tab, j) {
@@ -523,27 +579,56 @@
 			});
 
 			const map = document.getElementById('region-map');
-			map.innerHTML = '';
 			hide_city();
 			cities = [];
 
-			const img = element('img', {src: SC4MP_API + region.map + '?width=' + MAP_WIDTH, alt: 'Map of ' + name});
-			const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-			svg.setAttribute('viewBox', '0 0 1 1');
-			svg.setAttribute('preserveAspectRatio', 'none');
-			map.appendChild(img);
-			map.appendChild(svg);
+			// The map and its outline layer are made once; switching regions fades the old map until the new one has loaded
+			let svg = map.querySelector('svg');
+			if (!svg) {
+				svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+				svg.setAttribute('viewBox', '0 0 1 1');
+				svg.setAttribute('preserveAspectRatio', 'none');
+				map.appendChild(svg);
+			}
+			map.classList.add('loading');
+
+			let loaded = false;
+			let data = null;
+			const next_map = new Image();
+			next_map.onload = function() {
+				if (current != i) {
+					return;
+				}
+				next_map.alt = 'Map of ' + name;
+				next_map.className = 'shown';
+				const old = map.querySelector('img');
+				if (old) {
+					map.replaceChild(next_map, old);	// the loaded image itself, so there's no blank moment
+				} else {
+					map.insertBefore(next_map, svg);
+				}
+				map.classList.remove('loading');
+				loaded = true;
+				if (data) {
+					cities = data.cities;
+				}
+				[i - 1, i + 1].forEach(function(j) {	// so flipping to the next region is quick
+					new Image().src = map_url(regions[(j + regions.length) % regions.length][1]);
+				});
+			};
+			next_map.src = map_url(region);
 
 			if (region.map_cities) {
-				api(region.map_cities).then(function(data) {
-					if (current == i) {
+				api(region.map_cities).then(function(result) {
+					data = result;
+					if (current == i && loaded) {
 						cities = data.cities;
 					}
 				}).catch(function() {});
 			}
 
 			map.onmousemove = function(e) {
-				const rect = img.getBoundingClientRect();
+				const rect = map.querySelector('img').getBoundingClientRect();
 				const city = city_at((e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height);
 				if (city) {
 					show_city(city, svg, e.clientX, e.clientY);
