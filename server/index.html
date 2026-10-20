@@ -53,42 +53,13 @@
 			margin-bottom: 12px;
 		}
 
-		.server-lock {
-			display: inline-flex;
-			align-items: center;
-			gap: 8px;
-			margin-bottom: 14px;
-			padding: 4px 12px;
-			border: 1px solid rgba(255, 215, 76, 0.6);
-			border-radius: 20px;
-			color: #ffd74c;
-			font-size: 0.9rem;
+		.server-header h1 img {
+			vertical-align: 6px;
+			margin-left: 10px;
 		}
 
-		.lock-icon {
-			width: 11px;
-			height: 15px;
-			vertical-align: -2px;
-		}
-
-		.server-stats {
-			display: flex;
-			justify-content: center;
-			flex-wrap: wrap;
-			gap: 8px 40px;
-			margin: 8px 0 28px 0;
-		}
-
-		.server-stats strong {
-			display: block;
-			font-size: 1.75rem;
-			font-weight: 300;
-			line-height: 1.2;
-		}
-
-		.server-stats span {
-			color: rgba(255, 255, 255, 0.7);
-			font-size: 0.875rem;
+		.server-header .counts {
+			margin-bottom: 24px;
 		}
 
 		.server-header .btn {
@@ -120,35 +91,14 @@
 			line-height: 1.7;
 		}
 
-		.server-website {
-			color: #D03333;
-			font-weight: 500;
-		}
-
 		/* Like the Info tab of the launcher's server details */
-		.server-details {
-			padding-left: 24px;
-			border-left: 1px solid #e3e6ea;
+		.server-details td {
+			padding: 3px 0;
 		}
 
-		.server-details dl {
-			margin: 0;
-		}
-
-		.server-details .row {
-			border-bottom: 1px solid #e3e6ea;
-			padding: 6px 0;
-			margin: 0;
-		}
-
-		.server-details dt {
-			padding: 0;
-		}
-
-		.server-details dd {
-			padding: 0;
-			margin: 0;
-			text-align: right;
+		.server-details td:first-child {
+			font-weight: bold;
+			padding-right: 24px;
 		}
 
 		.yes {
@@ -160,6 +110,7 @@
 		}
 
 		.invite-link {
+			max-width: 420px;
 			margin-top: 16px;
 		}
 
@@ -192,22 +143,27 @@
 			}
 		}
 
-		/* Region maps */
+		/* Region maps, with a tab for each region like the launcher */
 
 		.regions-section {
 			padding: 48px 0 72px 0;
 		}
 
-		.region-stage {
-			position: relative;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 28px 70px;
-			min-height: 320px;
-			background: radial-gradient(ellipse at center, #2b3a4a 0%, #141c25 100%);
-			border-radius: 4px;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+		.region-tabs {
+			flex-wrap: nowrap;
+			overflow-x: auto;
+			overflow-y: hidden;
+			margin-bottom: 24px;
+		}
+
+		.region-tabs .nav-link {
+			white-space: nowrap;
+			color: #555;
+			cursor: pointer;
+		}
+
+		.region-tabs .nav-link.active {
+			color: #D03333;
 		}
 
 		.region-map {
@@ -220,7 +176,6 @@
 		.region-map img {
 			max-width: 100%;
 			max-height: 70vh;
-			filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.45));
 		}
 
 		.region-map svg {
@@ -233,151 +188,49 @@
 		}
 
 		.region-map polygon {
-			fill: rgba(255, 215, 76, 0.25);
-			stroke: #ffd74c;
+			fill: none;
+			stroke: white;
 			stroke-width: 2px;
 			vector-effect: non-scaling-stroke;
 		}
 
-		.region-arrow {
-			position: absolute;
-			top: 50%;
-			transform: translateY(-50%);
-			width: 48px;
-			height: 48px;
-			padding: 0;
-			border: 1px solid rgba(255, 255, 255, 0.35);
-			border-radius: 50%;
-			background: rgba(0, 0, 0, 0.35);
-			color: white;
-			font-size: 1.1rem;
-			cursor: pointer;
-			z-index: 2;
-		}
-
-		.region-arrow:hover, .region-arrow:focus {
-			background: rgba(0, 0, 0, 0.6);
-			border-color: white;
-			outline: none;
-		}
-
-		.region-arrow:focus-visible {
-			box-shadow: 0 0 0 3px #ffd74c;
-		}
-
-		.region-arrow.prev {
-			left: 12px;
-		}
-
-		.region-arrow.next {
-			right: 12px;
-		}
-
-		.region-caption {
-			margin: 24px 0 16px 0;
-		}
-
-		.region-caption h5 {
-			margin-bottom: 2px;
-		}
-
-		.region-thumbs {
+		.region-nav {
 			display: flex;
-			justify-content: center;
-			flex-wrap: wrap;
-			gap: 10px;
-		}
-
-		.region-thumb {
-			width: 120px;
-			padding: 4px;
-			border: 2px solid transparent;
-			border-radius: 4px;
-			background: #1d2733;
-			cursor: pointer;
-		}
-
-		.region-thumb img {
-			width: 100%;
-			height: 52px;
-			object-fit: contain;
-		}
-
-		.region-thumb span {
-			display: block;
-			margin-top: 4px;
-			font-size: 0.75rem;
-			color: rgba(255, 255, 255, 0.85);
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-
-		.region-thumb.active, .region-thumb:focus-visible {
-			border-color: #ffd74c;
-			outline: none;
+			justify-content: space-between;
+			align-items: center;
+			margin-top: 16px;
 		}
 
 		/* City info, like the Cities tab of the launcher's server details */
 		.city-tooltip {
 			position: fixed;
 			z-index: 1050;
-			min-width: 210px;
-			max-width: 270px;
+			min-width: 200px;
 			background: white;
-			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-			padding: 10px 14px;
-			font-size: 0.875rem;
+			border: 1px solid #999;
+			padding: 6px 10px;
+			font-size: 0.85rem;
 			text-align: left;
 			pointer-events: none;
 			display: none;
 		}
 
 		.city-tooltip h6 {
-			margin: 0;
+			margin: 0 0 4px 0;
 			font-weight: bold;
 		}
 
 		.city-tooltip table {
 			width: 100%;
-			margin-top: 6px;
 		}
 
 		.city-tooltip td:first-child {
-			font-weight: bold;
-			padding-right: 12px;
+			padding-right: 16px;
+			color: #666;
 		}
 
 		.city-tooltip td:last-child {
 			text-align: right;
-		}
-
-		.rci {
-			display: flex;
-			height: 6px;
-			border-radius: 3px;
-			overflow: hidden;
-			margin-top: 6px;
-			background: #e9ecef;
-		}
-
-		.rci .r, .swatch.r { background: #4caf50; }
-		.rci .c, .swatch.c { background: #3f7fd8; }
-		.rci .i, .swatch.i { background: #e0a526; }
-
-		.swatch {
-			display: inline-block;
-			width: 8px;
-			height: 8px;
-			border-radius: 2px;
-			margin-right: 6px;
-		}
-
-		@media (max-width: 991px) {
-			.server-details {
-				padding-left: 0;
-				border-left: none;
-			}
 		}
 
 		@media (max-width: 576px) {
@@ -386,30 +239,6 @@
 			}
 			.server-header h1 {
 				font-size: 32px;
-			}
-			.region-stage {
-				padding: 16px 8px 64px 8px;
-				min-height: 200px;
-			}
-			.region-arrow {
-				top: auto;
-				bottom: 10px;
-				transform: none;
-			}
-			.region-arrow.prev {
-				left: calc(50% - 56px);
-			}
-			.region-arrow.next {
-				right: calc(50% - 56px);
-			}
-			.region-thumbs {
-				flex-wrap: nowrap;
-				justify-content: flex-start;
-				overflow-x: auto;
-				padding-bottom: 6px;
-			}
-			.region-thumb {
-				flex: 0 0 auto;
 			}
 		}
 
@@ -463,16 +292,13 @@
 	<section class="regions-section" id="regions" style="display: none;">
 		<div class="container text-center">
 			<h6 class="display-4 has-line">REGIONS</h6>
-			<div class="region-stage">
-				<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
-				<div class="region-map" id="region-map"></div>
-				<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
-			</div>
-			<div class="region-caption">
-				<h5 id="region-name"></h5>
+			<ul class="nav nav-tabs region-tabs" id="region-tabs" role="tablist" aria-label="Regions"></ul>
+			<div class="region-map" id="region-map"></div>
+			<div class="region-nav">
+				<button type="button" class="btn btn-outline-primary btn-sm" id="region-prev"><span class="ti-angle-left"></span> Previous</button>
 				<span class="text-muted small" id="region-note"></span>
+				<button type="button" class="btn btn-outline-primary btn-sm" id="region-next">Next <span class="ti-angle-right"></span></button>
 			</div>
-			<div class="region-thumbs" id="region-thumbs" role="tablist" aria-label="Regions"></div>
 		</div>
 	</section>
 	<footer class="footer py-4 bg-dark text-light"> </footer>
@@ -551,23 +377,15 @@
 
 			// Header: name, mayors (like the server list), Join and the server's website
 			const header = document.getElementById('server-header');
-			header.appendChild(element('h1', null, info.server_name));
+			const h1 = header.appendChild(element('h1', null, info.server_name));
 			if (info.password_enabled) {	// the server list's lock
-				const lock = header.appendChild(element('div', {class: 'server-lock'}));
-				lock.appendChild(element('img', {src: '../assets/imgs/lock-icon.png', alt: '', width: 15, height: 20}));
-				lock.appendChild(document.createTextNode('Password required'));
+				h1.appendChild(element('img', {src: '../assets/imgs/lock-icon.png', alt: 'Password required', title: 'Password required', width: 15, height: 20}));
 			}
-			const counts = header.appendChild(element('div', {class: 'server-stats'}));	// the server list's columns
-			[
-				[format_number(stats.stat_mayors), 'Mayors'],
-				[format_number(stats.stat_mayors_online), 'Online'],
-				[Math.floor((stats.stat_claimed || 0) * 100) + '%', 'Claimed'],
-				[format_filesize(stats.stat_download || 0), 'Download'],
-			].forEach(function(stat) {
-				const d = counts.appendChild(element('div'));
-				d.appendChild(element('strong', null, stat[0]));
-				d.appendChild(element('span', null, stat[1]));
-			});
+
+			// Worded like the line under the server list
+			const online = Number(stats.stat_mayors_online || 0);
+			const counts = header.appendChild(element('p', {class: 'counts'}));
+			counts.innerHTML = 'Currently <b>' + format_number(online) + '</b> ' + (online == 1 ? 'mayor' : 'mayors') + ' online out of <b>' + format_number(stats.stat_mayors) + '</b> total, with <b>' + Math.floor((stats.stat_claimed || 0) * 100) + '%</b> claimed. Download size <b>' + format_filesize(stats.stat_download || 0) + '</b>.';	// only numbers
 			header.appendChild(element('a', {class: 'btn btn-primary btn-lg', href: server.url}, 'Join'));
 			if (info.server_url) {
 				header.appendChild(element('a', {class: 'btn btn-outline-light btn-lg', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, 'Website'));
@@ -581,9 +399,7 @@
 			about.appendChild(element('p', {class: 'server-description'}, info.server_description || 'This server has no description.'));
 			if (info.server_url) {
 				const p = about.appendChild(element('p'));
-				const link = p.appendChild(element('a', {class: 'server-website', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}));
-				link.appendChild(element('span', {class: 'ti-link'}));
-				link.appendChild(document.createTextNode('\u2002' + info.server_url));
+				p.appendChild(element('a', {href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, info.server_url));
 			}
 
 			// Details, like the Info tab of the launcher's server details
@@ -607,14 +423,11 @@
 			if (info.godmode_filter != null) {
 				rows.push(['Godmode claims', yes_no(!info.godmode_filter, true)]);
 			}
-			const dl = details.appendChild(element('dl'));
+			const table = details.appendChild(element('table'));
 			rows.forEach(function(row) {
-				const r = dl.appendChild(element('div', {class: 'row'}));
-				r.appendChild(element('dt', {class: 'col-6'}, row[0]));
-				const dd = r.appendChild(element('dd', {class: 'col-6 ' + row[1][1]}, row[1][0]));
-				if (row[0] == 'Public' && info.password_enabled) {
-					dd.prepend(element('img', {class: 'lock-icon mr-2', src: '../assets/imgs/lock-icon.png', alt: ''}));
-				}
+				const tr = table.appendChild(element('tr'));
+				tr.appendChild(element('td', null, row[0]));
+				tr.appendChild(element('td', {class: row[1][1]}, row[1][0]));
 			});
 
 			// Invite link
@@ -647,13 +460,13 @@
 
 			document.getElementById('regions').style.display = '';
 
-			const thumbs = document.getElementById('region-thumbs');
+			const tabs = document.getElementById('region-tabs');
 			regions.forEach(function(region, i) {
-				const thumb = element('button', {type: 'button', class: 'region-thumb', role: 'tab', 'aria-label': region[0]});
-				thumb.appendChild(element('img', {src: SC4MP_API + region[1].map + '?width=240', alt: '', loading: 'lazy'}));
-				thumb.appendChild(element('span', null, region[0]));
-				thumb.addEventListener('click', function() { show_region(i); });
-				thumbs.appendChild(thumb);
+				const tab = tabs.appendChild(element('li', {class: 'nav-item'})).appendChild(element('a', {class: 'nav-link', role: 'tab', href: '#' + encodeURIComponent(region[0])}, region[0]));
+				tab.addEventListener('click', function(e) {
+					e.preventDefault();
+					show_region(i);
+				});
 			});
 
 			const prev = document.getElementById('region-prev');
@@ -690,21 +503,20 @@
 
 			history.replaceState(null, '', '#' + encodeURIComponent(name));
 
-			document.getElementById('region-name').textContent = name;
 			let note = format_number(region.cities) + (region.cities == 1 ? ' city' : ' cities');
 			if (region.ready < region.cities) {
 				note += ' (' + format_number(region.cities - region.ready) + ' not on the map yet)';
 			}
 			if (regions.length > 1) {
-				note = 'Region ' + (i + 1) + ' of ' + regions.length + ', ' + note;
+				note = name + ' (' + (i + 1) + ' of ' + regions.length + '), ' + note;
 			}
 			document.getElementById('region-note').textContent = note;
 
-			document.querySelectorAll('.region-thumb').forEach(function(thumb, j) {
-				thumb.classList.toggle('active', j == i);
-				thumb.setAttribute('aria-selected', j == i);
-				if (j == i && thumb.parentNode.scrollWidth > thumb.parentNode.clientWidth) {	// keep it in view when the strip scrolls (phones)
-					thumb.parentNode.scrollLeft = thumb.offsetLeft - thumb.parentNode.offsetLeft - (thumb.parentNode.clientWidth - thumb.offsetWidth) / 2;
+			document.querySelectorAll('#region-tabs .nav-link').forEach(function(tab, j) {
+				tab.classList.toggle('active', j == i);
+				tab.setAttribute('aria-selected', j == i);
+				if (j == i && tab.parentNode.parentNode.scrollWidth > tab.parentNode.parentNode.clientWidth) {	// keep it in view when the tabs scroll (phones)
+					tab.parentNode.parentNode.scrollLeft = tab.parentNode.offsetLeft - tab.parentNode.parentNode.offsetLeft - 40;
 				}
 			});
 
@@ -781,12 +593,9 @@
 					tooltip.appendChild(element('div', {class: 'text-muted'}, 'Unclaimed'));
 				}
 				const table = element('table');
-				const row = function(label, value, swatch) {
+				const row = function(label, value) {
 					const tr = element('tr');
-					const td = tr.appendChild(element('td', null, label));
-					if (swatch) {
-						td.prepend(element('span', {class: 'swatch ' + swatch}));
-					}
+					tr.appendChild(element('td', null, label));
 					tr.appendChild(element('td', null, value));
 					table.appendChild(tr);
 				};
@@ -796,22 +605,14 @@
 				if (city.mayor_rating != null) {
 					row('Rating', city.mayor_rating);
 					row('Funds', '§' + format_number(city.total_funds));
-					row('Residential', format_number(city.residential_population), 'r');
-					row('Commercial', format_number(city.commercial_population), 'c');
-					row('Industrial', format_number(city.industrial_population), 'i');
+					row('Residential', format_number(city.residential_population));
+					row('Commercial', format_number(city.commercial_population));
+					row('Industrial', format_number(city.industrial_population));
 				}
 				if (city.modified) {
 					row('Modified', moment(city.modified, 'YYYY-MM-DD HH:mm:ss').fromNow());
 				}
 				tooltip.appendChild(table);
-
-				const population = (city.residential_population || 0) + (city.commercial_population || 0) + (city.industrial_population || 0);
-				if (population > 0) {
-					const bar = tooltip.appendChild(element('div', {class: 'rci'}));
-					[['r', city.residential_population], ['c', city.commercial_population], ['i', city.industrial_population]].forEach(function(part) {
-						bar.appendChild(element('div', {class: part[0], style: 'width: ' + (100 * (part[1] || 0) / population) + '%'}));
-					});
-				}
 
 				tooltip.style.display = 'block';
 			}
