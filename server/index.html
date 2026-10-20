@@ -29,7 +29,7 @@
 			background-size: cover;
 			background-position: center center;
 			color: white;
-			padding: 100px 0 56px 0;
+			padding: 96px 0 36px 0;
 			text-align: center;
 		}
 
@@ -38,7 +38,7 @@
 			text-align: left;
 			color: rgba(255, 255, 255, 0.75);
 			font-size: 0.9rem;
-			margin-bottom: 28px;
+			margin-bottom: 16px;
 		}
 
 		.server-header .back:hover {
@@ -59,7 +59,7 @@
 		}
 
 		.server-header .counts {
-			margin-bottom: 24px;
+			margin-bottom: 20px;
 		}
 
 		.server-header .btn {
@@ -152,7 +152,7 @@
 		/* Region maps, with a tab for each region like the launcher */
 
 		.regions-section {
-			padding: 40px 0 64px 0;
+			padding: 24px 0 40px 0;
 		}
 
 		.region-tabs {
@@ -186,7 +186,7 @@
 
 		.region-map img {
 			max-width: 100%;
-			max-height: 70vh;
+			max-height: 75vh;
 			transition: opacity 0.25s;
 		}
 
@@ -342,16 +342,6 @@
 			<div id="server-header"></div>
 		</div>
 	</header>
-	<section class="about-section bg-light" id="server" style="display: none;">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-7 mb-4" id="server-about"></div>
-				<div class="col-lg-5">
-					<div class="server-details" id="server-details"></div>
-				</div>
-			</div>
-		</div>
-	</section>
 	<section class="regions-section" id="regions" style="display: none;">
 		<div class="container text-center">
 			<ul class="nav nav-tabs region-tabs" id="region-tabs" role="tablist" aria-label="Regions"></ul>
@@ -361,6 +351,16 @@
 				<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
 			</div>
 			<p class="text-muted small mt-3 mb-0" id="region-note"></p>
+		</div>
+	</section>
+	<section class="about-section bg-light" id="server" style="display: none;">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-7 mb-4" id="server-about"></div>
+				<div class="col-lg-5">
+					<div class="server-details" id="server-details"></div>
+				</div>
+			</div>
 		</div>
 	</section>
 	<footer class="footer py-4 bg-dark text-light"> </footer>
