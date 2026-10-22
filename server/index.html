@@ -817,9 +817,6 @@
 				const claimed = map_cities.filter(function(city) { return city.claimed; }).length;
 				note += ', ' + format_number(claimed) + ' claimed';
 			}
-			if (region.ready < region.cities) {
-				note += ' (' + format_number(region.cities - region.ready) + ' not on the map yet)';
-			}
 			if (map_cities && map_cities.length) {
 				note += '. ' + (window.matchMedia('(hover: hover)').matches ? 'Hover over' : 'Tap') + ' a city to see its mayor and population.';
 			}
