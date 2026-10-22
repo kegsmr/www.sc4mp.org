@@ -279,6 +279,11 @@
 			height: 66vh;	/* the same for every region, so the arrows and the caption stay put, and the page doesn't jump while a map loads */
 			min-height: 360px;
 			padding: 0 64px;
+			touch-action: pan-x pan-y;	/* pinching zooms the map, not the page */
+		}
+
+		.region-stage.zoomed {
+			overflow: hidden;
 		}
 
 		.region-map {
@@ -286,6 +291,15 @@
 			display: inline-block;
 			max-width: 100%;
 			line-height: 0;
+			transform-origin: 0 0;
+		}
+
+		.region-stage.zoomed .region-map {
+			cursor: grab;
+		}
+
+		.region-stage.dragging .region-map {
+			cursor: grabbing;
 		}
 
 		.region-map img {
@@ -312,8 +326,10 @@
 			}
 		}
 
-		.region-arrow {
+		.region-arrow,
+		.region-reset {
 			position: absolute;
+			z-index: 1;
 			top: 50%;
 			transform: translateY(-50%);
 			width: 44px;
@@ -327,9 +343,22 @@
 		}
 
 		.region-arrow:hover,
-		.region-arrow:focus-visible {
+		.region-arrow:focus-visible,
+		.region-reset:hover,
+		.region-reset:focus-visible {
 			background: #D03333;
 			outline: none;
+		}
+
+		.region-reset {
+			display: none;
+			top: 0;
+			right: 0;
+			transform: none;
+		}
+
+		.region-stage.zoomed .region-reset {
+			display: block;
 		}
 
 		.region-arrow.prev {
@@ -497,6 +526,7 @@
 					<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
 					<div class="region-map" id="region-map"></div>
 					<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
+					<button type="button" class="region-reset" id="region-reset" aria-label="Show the whole region" title="Show the whole region"><span class="ti-zoom-out"></span></button>
 				</div>
 				<div class="region-caption">
 					<h2 id="region-name"></h2>
@@ -528,6 +558,8 @@
 		const SC4MP_API = 'https://api.sc4mp.org';
 		const SC4MP_INVITES_DOMAIN = 'invite.sc4mp.org';
 		const MAP_WIDTH = 1600;
+		const ZOOMED_MAP_WIDTH = 4096;	// the largest the API renders
+		const MAX_ZOOM = 4;
 
 		const server_id = new URLSearchParams(window.location.search).get('id');
 
@@ -712,6 +744,8 @@
 				}
 			});
 
+			setup_zoom();
+
 			const hash = decodeURIComponent(window.location.hash.slice(1));
 			const start = regions.findIndex(function(region) { return region[0] == hash; });
 			show_region(start >= 0 ? start : 0);
@@ -748,6 +782,8 @@
 			const map = document.getElementById('region-map');
 			hide_city();
 			cities = [];
+			zoomed_map = false;
+			zoom_to(1, 0, 0);
 
 			// The map and its outline layer are made once; switching regions fades the old map until the new one has loaded
 			let svg = map.querySelector('svg');
@@ -819,8 +855,162 @@
 			}
 			if (map_cities && map_cities.length) {
 				note += '. ' + (window.matchMedia('(hover: hover)').matches ? 'Hover over' : 'Tap') + ' a city to see its mayor and population.';
+				if (window.matchMedia('(hover: hover)').matches) {
+					note += ' Hold Ctrl and scroll to zoom.';
+				} else {
+					note += ' Pinch to zoom.';
+				}
 			}
 			document.getElementById('region-note').textContent = note;
+		}
+
+		// ===== Zoom =====
+
+		let zoom = 1;
+		let pan_x = 0;	// how far the map is moved from where it sits unzoomed, in px
+		let pan_y = 0;
+		let wheel_zooms = false;	// plain scrolling zooms once the map has been clicked, so it doesn't get in the way of scrolling the page
+		let zoomed_map = false;	// whether the sharper map has been asked for
+
+		// Zooms to `scale`, keeping the point (x, y) of the stage under the cursor or fingers
+		function zoom_to(scale, x, y) {
+			const map = document.getElementById('region-map');
+			scale = Math.min(MAX_ZOOM, Math.max(1, scale));
+			pan_x = x - map.offsetLeft - (x - map.offsetLeft - pan_x) * scale / zoom;
+			pan_y = y - map.offsetTop - (y - map.offsetTop - pan_y) * scale / zoom;
+			zoom = scale;
+			pan(0, 0);
+		}
+
+		// Moves the map, keeping it inside the stage, or filling it when it's bigger
+		function pan(dx, dy) {
+			const map = document.getElementById('region-map');
+			const stage = map.parentNode;
+			pan_x = clamp(map.offsetLeft + pan_x + dx, stage.clientWidth - map.offsetWidth * zoom) - map.offsetLeft;
+			pan_y = clamp(map.offsetTop + pan_y + dy, stage.clientHeight - map.offsetHeight * zoom) - map.offsetTop;
+			if (zoom == 1) {
+				pan_x = 0;
+				pan_y = 0;
+			}
+			map.style.transform = 'translate(' + pan_x + 'px, ' + pan_y + 'px) scale(' + zoom + ')';
+			stage.classList.toggle('zoomed', zoom > 1);
+			if (zoom > 1 && !zoomed_map) {
+				load_zoomed_map();
+			}
+		}
+
+		function clamp(position, room) {
+			return Math.min(Math.max(position, Math.min(0, room)), Math.max(0, room));
+		}
+
+		// The same map at the largest size, swapped in once it has loaded
+		function load_zoomed_map() {
+			const map = document.getElementById('region-map');
+			const i = current;
+			zoomed_map = true;
+			const image = new Image();
+			image.onload = function() {
+				const old = map.querySelector('img');
+				if (current != i || !old || map.classList.contains('loading')) {
+					zoomed_map = false;	// asked for again on the next zoom
+					return;
+				}
+				old.src = image.src;	// the same element, so a pinch or drag on it carries on
+			};
+			image.src = SC4MP_API + regions[i][1].map + '?width=' + ZOOMED_MAP_WIDTH;
+		}
+
+		function setup_zoom() {
+
+			const map = document.getElementById('region-map');
+			const stage = map.parentNode;
+
+			const position = function(x, y) {	// in the stage
+				const rect = stage.getBoundingClientRect();
+				return [x - rect.left, y - rect.top];
+			};
+
+			// Ctrl+scroll (or pinching a touchpad), or plain scrolling once the map has been clicked
+			stage.addEventListener('wheel', function(e) {
+				if (!e.ctrlKey && (!wheel_zooms || (zoom == 1 && e.deltaY > 0))) {
+					return;
+				}
+				e.preventDefault();
+				let delta = e.deltaY;
+				if (e.deltaMode == 1) {	// lines
+					delta *= 33;
+				}
+				const p = position(e.clientX, e.clientY);
+				zoom_to(zoom * Math.pow(1.002, -delta), p[0], p[1]);
+			}, {passive: false});
+			map.addEventListener('click', function() { wheel_zooms = true; });
+			stage.addEventListener('mouseleave', function() { wheel_zooms = false; });
+
+			// Dragging
+			let drag = null;
+			stage.addEventListener('mousedown', function(e) {
+				if (zoom == 1 || e.button != 0 || e.target.closest('button')) {
+					return;
+				}
+				e.preventDefault();
+				drag = [e.clientX, e.clientY];
+				stage.classList.add('dragging');
+			});
+			document.addEventListener('mousemove', function(e) {
+				if (drag) {
+					pan(e.clientX - drag[0], e.clientY - drag[1]);
+					drag = [e.clientX, e.clientY];
+				}
+			});
+			document.addEventListener('mouseup', function() {
+				drag = null;
+				stage.classList.remove('dragging');
+			});
+
+			// Pinching and moving two fingers on phones; one finger still scrolls the page
+			let pinch = null;
+			const fingers = function(e) {
+				const a = e.touches[0];
+				const b = e.touches[1];
+				const p = position((a.clientX + b.clientX) / 2, (a.clientY + b.clientY) / 2);
+				return {x: p[0], y: p[1], distance: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)};
+			};
+			stage.addEventListener('touchstart', function(e) {
+				if (e.touches.length == 2) {
+					e.preventDefault();
+					pinch = fingers(e);
+				}
+			}, {passive: false});
+			stage.addEventListener('touchmove', function(e) {
+				if (pinch && e.touches.length == 2) {
+					e.preventDefault();
+					const next = fingers(e);
+					pan(next.x - pinch.x, next.y - pinch.y);
+					zoom_to(zoom * next.distance / pinch.distance, next.x, next.y);
+					pinch = next;
+				}
+			}, {passive: false});
+			const end_pinch = function(e) {
+				if (e.touches.length < 2) {
+					pinch = null;
+				}
+			};
+			stage.addEventListener('touchend', end_pinch);
+			stage.addEventListener('touchcancel', end_pinch);
+
+			// Back to the whole region
+			const reset = function() {
+				zoom_to(1, 0, 0);
+			};
+			stage.addEventListener('dblclick', function(e) {
+				if (!e.target.closest('button')) {
+					reset();
+				}
+			});
+			document.getElementById('region-reset').addEventListener('click', reset);
+			window.addEventListener('resize', function() {
+				pan(0, 0);
+			});
 		}
 
 		// ===== Cities =====
