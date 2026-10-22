@@ -31,7 +31,7 @@
 				linear-gradient(rgba(0, 0, 0, 0.07) 2px, transparent 2px) 0 -1px / 8px 8px,
 				#3c6078;
 			color: white;
-			padding: 88px 0 28px 0;
+			padding: 88px 0 64px 0;	/* room for the server card over its bottom edge */
 			text-align: center;
 		}
 
@@ -58,54 +58,108 @@
 			text-decoration: underline;
 		}
 
-		/* The server, under its map */
+		/* The server, in cards on the home page's light blue, the first one overlapping the map's bottom edge */
 		.server-section {
-			padding: 40px 0 64px 0;
+			display: flow-root;	/* so the card's negative margin moves the card, not the whole section */
+			background: #eaf0fc;
+			padding: 0 0 64px 0;
 		}
 
-		.server-title {
-			text-align: center;
-			margin-bottom: 40px;
+		.server-card {
+			background: white;
+			border-radius: 6px;
+			box-shadow: 0 2px 10px rgba(30, 50, 80, 0.12);
+			padding: 24px 28px;
+			margin-bottom: 24px;
 		}
 
-		.server-title h1 {
-			font-size: 42px;
-			font-weight: 300;
-			color: #333;
+		.server-main {
+			position: relative;
+			margin-top: -40px;
+		}
+
+		.server-main .top {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.server-main h1 {
+			font-size: 34px;
+			font-weight: 400;
+			color: #233;
 			word-wrap: break-word;
-			margin-bottom: 8px;
+			margin: 0;
 		}
 
-		.server-title h1 img {
-			vertical-align: 6px;
+		.server-main h1 img {
+			vertical-align: 4px;
 			margin-left: 10px;
 		}
 
-		.server-title .counts {
-			color: #555;
-			margin-bottom: 20px;
+		.server-main .join {
+			text-align: center;
+			margin: 8px 0;
 		}
 
-		.server-title .btn {
-			min-width: 160px;
-			margin: 6px;
+		.server-main .join .btn {
+			min-width: 180px;
 		}
 
-		.server-title .launcher-note {
-			margin: 10px 0 0 0;
-			font-size: 0.85rem;
-			color: #777;
+		.server-main .launcher-note {
+			margin: 6px 0 0 0;
+			font-size: 0.8rem;
+			color: #888;
 		}
 
-		.server-title .launcher-note a {
+		.server-main .launcher-note a {
 			color: #D03333;
+		}
+
+		/* Like the columns of the server list */
+		.server-stats {
+			display: flex;
+			flex-wrap: wrap;
+			border-top: 1px solid #e3e8f0;
+			margin-top: 18px;
+			padding-top: 16px;
+		}
+
+		.server-stats div {
+			flex: 1 1 0;
+			min-width: 110px;
+			padding: 4px 0;
+		}
+
+		.server-stats div + div {
+			border-left: 1px solid #e3e8f0;
+			padding-left: 20px;
+		}
+
+		.server-stats b {
+			display: block;
+			font-size: 1.5rem;
+			font-weight: 400;
+			color: #233;
+		}
+
+		.server-stats span {
+			font-size: 0.85rem;
+			color: #888;
+		}
+
+		.server-card h5 {
+			font-size: 1.1rem;
+			font-weight: 700;
+			color: #233;
+			margin-bottom: 14px;
 		}
 
 		.server-description {
 			white-space: pre-line;
-			font-size: 1.05rem;
-			font-weight: 400;
-			color: #333;
+			font-size: 1rem;
+			color: #444;
 			line-height: 1.7;
 		}
 
@@ -113,33 +167,54 @@
 		.server-url {
 			color: #0b63ce;
 			text-decoration: underline;
+			word-break: break-all;
 		}
 
 		/* Like the Info tab of the launcher's server details */
+		.server-details table {
+			width: 100%;
+		}
+
 		.server-details td {
-			padding: 3px 0;
+			padding: 7px 0;
+			border-bottom: 1px solid #eef1f6;
 		}
 
 		.server-details td:first-child {
-			font-weight: bold;
-			padding-right: 24px;
+			color: #666;
 		}
 
-		.yes {
-			color: #3c8a2e;
+		.server-details td:last-child {
+			text-align: right;
+			color: #233;
 		}
 
-		.no {
-			color: #D03333;
+		.yes::before,
+		.no::before {
+			content: "";
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			margin-right: 7px;
+			vertical-align: 1px;
+		}
+
+		.yes::before {
+			background: #3c8a2e;
+		}
+
+		.no::before {
+			background: #D03333;
 		}
 
 		.invite-link {
-			max-width: 420px;
-			margin-top: 16px;
+			margin-top: 18px;
 		}
 
 		.invite-link label {
-			font-weight: bold;
+			font-size: 0.85rem;
+			color: #666;
 			margin-bottom: 4px;
 		}
 
@@ -337,10 +412,29 @@
 
 		@media (max-width: 576px) {
 			.map-hero {
-				padding: 80px 0 24px 0;
+				padding: 80px 0 56px 0;
 			}
-			.server-title h1 {
-				font-size: 32px;
+			.server-main h1 {
+				font-size: 28px;
+			}
+			.server-main .join {
+				width: 100%;
+				margin-top: 14px;
+			}
+			.server-main .join .btn {
+				width: 100%;
+			}
+			.server-stats {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				row-gap: 12px;
+			}
+			.server-stats div + div {
+				border-left: none;
+				padding-left: 0;
+			}
+			.server-card {
+				padding: 20px;
 			}
 			.region-tabs {
 				justify-content: flex-start;
@@ -413,11 +507,13 @@
 	</header>
 	<section class="server-section" id="server" style="display: none;">
 		<div class="container">
-			<div class="server-title" id="server-header"></div>
+			<div class="server-card server-main" id="server-header"></div>
 			<div class="row">
-				<div class="col-lg-7 mb-4" id="server-about"></div>
+				<div class="col-lg-7">
+					<div class="server-card" id="server-about"></div>
+				</div>
 				<div class="col-lg-5">
-					<div class="server-details" id="server-details"></div>
+					<div class="server-card server-details" id="server-details"></div>
 				</div>
 			</div>
 		</div>
@@ -496,23 +592,33 @@
 
 			document.title = 'The SimCity 4 Multiplayer Project - ' + info.server_name;
 
-			// Header: name, mayors (like the server list) and Join
+			// Name and Join, then the server list's columns
 			const header = document.getElementById('server-header');
-			const h1 = header.appendChild(element('h1', null, info.server_name));
+			const top = header.appendChild(element('div', {class: 'top'}));
+			const h1 = top.appendChild(element('h1', null, info.server_name));
 			if (info.password_enabled) {	// the server list's lock
 				h1.appendChild(element('img', {src: '../assets/imgs/lock-icon.png', alt: 'Password required', title: 'Password required', width: 15, height: 20}));
 			}
+			const join = top.appendChild(element('div', {class: 'join'}));
+			join.appendChild(element('a', {class: 'btn btn-primary btn-lg', href: server.url}, 'Join'));
+			const note = join.appendChild(element('p', {class: 'launcher-note'}, 'Needs the SC4MP Launcher. '));
+			note.appendChild(element('a', {href: '/#download'}, 'Download'));
 
-			// Worded like the line under the server list
-			const online = Number(stats.stat_mayors_online || 0);
-			const counts = header.appendChild(element('p', {class: 'counts'}));
-			counts.innerHTML = 'Currently <b>' + format_number(online) + '</b> ' + (online == 1 ? 'mayor' : 'mayors') + ' online out of <b>' + format_number(stats.stat_mayors) + '</b> total, with <b>' + Math.floor((stats.stat_claimed || 0) * 100) + '%</b> claimed. Download size <b>' + format_filesize(stats.stat_download || 0) + '</b>.';	// only numbers
-			header.appendChild(element('a', {class: 'btn btn-primary btn-lg', href: server.url}, 'Join'));
-			const note = header.appendChild(element('p', {class: 'launcher-note'}, 'Joining requires the SC4MP Launcher. '));
-			note.appendChild(element('a', {href: '/#download'}, 'Download it here.'));
+			const columns = header.appendChild(element('div', {class: 'server-stats'}));
+			[
+				[format_number(stats.stat_mayors), 'Mayors'],
+				[format_number(stats.stat_mayors_online), 'Online'],
+				[Math.floor((stats.stat_claimed || 0) * 100) + '%', 'Claimed'],
+				[format_filesize(stats.stat_download || 0), 'Download'],
+			].forEach(function(column) {
+				const div = columns.appendChild(element('div'));
+				div.appendChild(element('b', null, column[0]));
+				div.appendChild(element('span', null, column[1]));
+			});
 
 			// Description, and the server's website (like the launcher)
 			const about = document.getElementById('server-about');
+			about.appendChild(element('h5', null, 'About'));
 			about.appendChild(element('p', {class: 'server-description'}, info.server_description || 'This server has no description.'));
 			if (info.server_url) {
 				const p = about.appendChild(element('p'));
@@ -521,6 +627,7 @@
 
 			// Details, like the Info tab of the launcher's server details
 			const details = document.getElementById('server-details');
+			details.appendChild(element('h5', null, 'Details'));
 			const yes_no = function(yes, good) {
 				return [yes ? 'Yes' : 'No', (yes == good) ? 'yes' : 'no'];
 			};
