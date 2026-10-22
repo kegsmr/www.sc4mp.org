@@ -292,6 +292,7 @@
 			max-width: 100%;
 			line-height: 0;
 			transform-origin: 0 0;
+			stroke-width: 2px;	/* the city outline, set to 2px divided by the zoom so it stays 2px on screen */
 		}
 
 		.region-stage.zoomed .region-map {
@@ -382,7 +383,6 @@
 		.region-map polygon {
 			fill: rgba(255, 215, 76, 0.18);
 			stroke: #ffd74c;
-			stroke-width: 2px;
 			vector-effect: non-scaling-stroke;
 		}
 
@@ -834,6 +834,9 @@
 			}
 
 			map.onmousemove = function(e) {
+				if (map.parentNode.classList.contains('dragging')) {
+					return;
+				}
 				const rect = map.querySelector('img').getBoundingClientRect();
 				const city = city_at((e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height);
 				if (city) {
@@ -853,13 +856,16 @@
 				const claimed = map_cities.filter(function(city) { return city.claimed; }).length;
 				note += ', ' + format_number(claimed) + ' claimed';
 			}
+			const hover = window.matchMedia('(hover: hover)').matches;
 			if (map_cities && map_cities.length) {
-				note += '. ' + (window.matchMedia('(hover: hover)').matches ? 'Hover over' : 'Tap') + ' a city to see its mayor and population.';
-				if (window.matchMedia('(hover: hover)').matches) {
-					note += ' Hold Ctrl and scroll to zoom.';
-				} else {
-					note += ' Pinch to zoom.';
-				}
+				note += '. ' + (hover ? 'Hover over' : 'Tap') + ' a city to see its mayor and population.';
+			} else {
+				note += '.';
+			}
+			if (hover) {
+				note += ' Hold Ctrl and scroll to zoom.';
+			} else {
+				note += ' Pinch to zoom.';
 			}
 			document.getElementById('region-note').textContent = note;
 		}
@@ -893,6 +899,7 @@
 				pan_y = 0;
 			}
 			map.style.transform = 'translate(' + pan_x + 'px, ' + pan_y + 'px) scale(' + zoom + ')';
+			map.style.strokeWidth = (2 / zoom) + 'px';
 			stage.classList.toggle('zoomed', zoom > 1);
 			if (zoom > 1 && !zoomed_map) {
 				load_zoomed_map();
@@ -925,6 +932,10 @@
 			const map = document.getElementById('region-map');
 			const stage = map.parentNode;
 
+			const loading = function() {	// the next region's map isn't there yet
+				return map.classList.contains('loading');
+			};
+
 			const position = function(x, y) {	// in the stage
 				const rect = stage.getBoundingClientRect();
 				return [x - rect.left, y - rect.top];
@@ -936,6 +947,9 @@
 					return;
 				}
 				e.preventDefault();
+				if (loading()) {
+					return;
+				}
 				let delta = e.deltaY;
 				if (e.deltaMode == 1) {	// lines
 					delta *= 33;
@@ -946,10 +960,12 @@
 			map.addEventListener('click', function() { wheel_zooms = true; });
 			stage.addEventListener('mouseleave', function() { wheel_zooms = false; });
 
-			// Dragging
+			// Dragging, without showing cities on the way or the one under the cursor at the end
 			let drag = null;
+			let dragged = false;
 			stage.addEventListener('mousedown', function(e) {
-				if (zoom == 1 || e.button != 0 || e.target.closest('button')) {
+				dragged = false;
+				if (zoom == 1 || e.button != 0 || e.target.closest('button') || loading()) {
 					return;
 				}
 				e.preventDefault();
@@ -960,8 +976,16 @@
 				if (drag) {
 					pan(e.clientX - drag[0], e.clientY - drag[1]);
 					drag = [e.clientX, e.clientY];
+					dragged = true;
+					hide_city();
 				}
 			});
+			stage.addEventListener('click', function(e) {
+				if (dragged) {
+					e.stopPropagation();
+					dragged = false;
+				}
+			}, true);
 			document.addEventListener('mouseup', function() {
 				drag = null;
 				stage.classList.remove('dragging');
@@ -976,7 +1000,7 @@
 				return {x: p[0], y: p[1], distance: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)};
 			};
 			stage.addEventListener('touchstart', function(e) {
-				if (e.touches.length == 2) {
+				if (e.touches.length == 2 && !loading()) {
 					e.preventDefault();
 					pinch = fingers(e);
 				}
