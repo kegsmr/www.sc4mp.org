@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="An SC4MP server: its info, regions and cities.">
+	<meta name="author" content="SimCity 4 Multiplayer Project">
+
+	<title>The SimCity 4 Multiplayer Project - Server</title>
+
+	<!-- font icons -->
+	<link rel="stylesheet" href="../assets/vendors/themify-icons/css/themify-icons.css">
+
+	<!-- Bootstrap + Rubic main styles -->
+	<link rel="stylesheet" href="../assets/css/rubic.css">
+
+	<!-- favicon-->
+	<link rel="icon" type="image/x-icon" href="/assets/imgs/favicon.ico">
+
+	<!-- moment.js -->
+	<script type="text/javascript" src="../assets/js/moment.js"></script>
+
+	<style>
+
+		/* The region map first, on a darker shade of the footer's blue (#44667d) */
+		.map-hero {
+			background: #20313b;
+			color: white;
+			padding: 88px 0 64px 0;	/* room for the server card over its bottom edge */
+			text-align: center;
+		}
+
+		.map-hero .back {
+			display: block;
+			text-align: left;
+			color: rgba(255, 255, 255, 0.75);
+			font-size: 0.9rem;
+			margin-bottom: 12px;
+		}
+
+		.map-hero .back:hover {
+			color: white;
+			text-decoration: none;
+		}
+
+		.map-hero .message {
+			font-size: 1.1rem;
+			margin: 48px 0;
+		}
+
+		.map-hero .message a {
+			color: white;
+			text-decoration: underline;
+		}
+
+		/* The server, in cards on the home page's light blue, the first one overlapping the map's bottom edge */
+		.server-section {
+			display: flow-root;	/* so the card's negative margin moves the card, not the whole section */
+			background: #eaf0fc;
+			padding: 0 0 64px 0;
+		}
+
+		.server-card {
+			background: white;
+			border-radius: 6px;
+			box-shadow: 0 2px 10px rgba(30, 50, 80, 0.12);
+			padding: 24px 28px;
+			margin-bottom: 24px;
+		}
+
+		.server-main {
+			position: relative;
+			margin-top: -40px;
+		}
+
+		.server-main .top {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.server-main h1 {
+			font-size: 34px;
+			font-weight: 400;
+			color: #233;
+			word-wrap: break-word;
+			margin: 0;
+		}
+
+		.server-main h1 img {
+			vertical-align: 4px;
+			margin-left: 10px;
+		}
+
+		.server-main .join {
+			text-align: center;
+			margin: 8px 0;
+		}
+
+		.server-main .join .btn {
+			min-width: 180px;
+		}
+
+		.server-main .launcher-note {
+			margin: 6px 0 0 0;
+			font-size: 0.8rem;
+			color: #888;
+		}
+
+		.server-main .launcher-note a {
+			color: #D03333;
+		}
+
+		/* Like the columns of the server list */
+		.server-stats {
+			display: flex;
+			flex-wrap: wrap;
+			border-top: 1px solid #e3e8f0;
+			margin-top: 18px;
+			padding-top: 16px;
+		}
+
+		.server-stats div {
+			flex: 1 1 0;
+			min-width: 110px;
+			padding: 4px 0;
+		}
+
+		.server-stats div + div {
+			border-left: 1px solid #e3e8f0;
+			padding-left: 20px;
+		}
+
+		.server-stats b {
+			display: block;
+			font-size: 1.5rem;
+			font-weight: 400;
+			color: #233;
+		}
+
+		.server-stats span {
+			font-size: 0.85rem;
+			color: #888;
+		}
+
+		.server-card h5 {
+			font-size: 1.1rem;
+			font-weight: 700;
+			color: #233;
+			margin-bottom: 14px;
+		}
+
+		.server-description {
+			white-space: pre-line;
+			font-size: 1rem;
+			color: #444;
+			line-height: 1.7;
+		}
+
+		/* Blue, like the server's link in the launcher */
+		.server-url {
+			color: #0b63ce;
+			text-decoration: underline;
+			word-break: break-all;
+		}
+
+		/* Like the Info tab of the launcher's server details */
+		.server-details table {
+			width: 100%;
+		}
+
+		.server-details td {
+			padding: 7px 0;
+			border-bottom: 1px solid #eef1f6;
+		}
+
+		.server-details td:first-child {
+			color: #666;
+		}
+
+		.server-details td:last-child {
+			text-align: right;
+			color: #233;
+		}
+
+		.yes::before,
+		.no::before {
+			content: "";
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			margin-right: 7px;
+			vertical-align: 1px;
+		}
+
+		.yes::before {
+			background: #3c8a2e;
+		}
+
+		.no::before {
+			background: #D03333;
+		}
+
+		.invite-link {
+			margin-top: 18px;
+		}
+
+		.invite-link label {
+			font-size: 0.85rem;
+			color: #666;
+			margin-bottom: 4px;
+		}
+
+		.loading-spinner {
+			display: flex;
+			justify-content: center;
+			padding: 40px 0;
+		}
+
+		.spinner {
+			border: 4px solid rgba(255, 255, 255, 0.2);
+			border-top: 4px solid #79A9F5;
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			animation: spin 1s linear infinite;
+		}
+
+		@keyframes spin {
+			0% {
+				transform: rotate(0deg);
+			}
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+
+		/* Region maps, on a dark stage like SC4's region view, with a tab for each region like the launcher */
+
+		.region-tabs {
+			display: flex;
+			justify-content: center;
+			flex-wrap: nowrap;
+			overflow-x: auto;
+			list-style: none;
+			padding: 0 0 4px 0;
+			margin: 0 0 20px 0;
+		}
+
+		.region-tabs a {
+			display: block;
+			white-space: nowrap;
+			padding: 6px 18px;
+			margin: 0 4px;
+			border-radius: 20px;
+			color: rgba(255, 255, 255, 0.7);
+			cursor: pointer;
+		}
+
+		.region-tabs a:hover {
+			color: white;
+			background: rgba(255, 255, 255, 0.1);
+			text-decoration: none;
+		}
+
+		.region-tabs a.active {
+			color: white;
+			background: #D03333;
+		}
+
+		.region-stage {
+			position: relative;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 66vh;	/* the same for every region, so the arrows and the caption stay put, and the page doesn't jump while a map loads */
+			min-height: 360px;
+			padding: 0 64px;
+		}
+
+		.region-map {
+			position: relative;
+			display: inline-block;
+			max-width: 100%;
+			line-height: 0;
+		}
+
+		.region-map img {
+			max-width: 100%;
+			max-height: max(66vh, 360px);
+			filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+			transition: opacity 0.25s;
+		}
+
+		.region-map.loading img {
+			opacity: 0.4;	/* the old map, until the next one has loaded */
+		}
+
+		.region-map img.shown {
+			animation: map-in 0.25s;
+		}
+
+		@keyframes map-in {
+			from {
+				opacity: 0.4;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+
+		.region-arrow {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 44px;
+			height: 44px;
+			padding: 0;
+			border: none;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.12);
+			color: white;
+			font-size: 1.1rem;
+		}
+
+		.region-arrow:hover,
+		.region-arrow:focus-visible {
+			background: #D03333;
+			outline: none;
+		}
+
+		.region-arrow.prev {
+			left: 0;
+		}
+
+		.region-arrow.next {
+			right: 0;
+		}
+
+		.region-map svg {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			pointer-events: none;
+		}
+
+		/* The city under the cursor, in the logo's yellow */
+		.region-map polygon {
+			fill: rgba(255, 215, 76, 0.18);
+			stroke: #ffd74c;
+			stroke-width: 2px;
+			vector-effect: non-scaling-stroke;
+		}
+
+		.region-caption {
+			margin-top: 18px;
+		}
+
+		.region-caption h2 {
+			font-size: 1.6rem;
+			font-weight: 300;
+			margin: 0;
+		}
+
+		.region-caption p {
+			color: rgba(255, 255, 255, 0.6);
+			font-size: 0.9rem;
+			margin: 4px 0 0 0;
+		}
+
+		/* City info, like the Cities tab of the launcher's server details */
+		.city-tooltip {
+			position: fixed;
+			z-index: 1050;
+			min-width: 210px;
+			background: white;
+			border-top: 3px solid #ffd74c;
+			border-radius: 4px;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+			padding: 8px 12px;
+			font-size: 0.85rem;
+			text-align: left;
+			pointer-events: none;
+			display: none;
+		}
+
+		.city-tooltip h6 {
+			margin: 0 0 4px 0;
+			font-weight: bold;
+		}
+
+		.city-tooltip table {
+			width: 100%;
+		}
+
+		.city-tooltip td:first-child {
+			padding-right: 16px;
+			color: #666;
+		}
+
+		.city-tooltip td:last-child {
+			text-align: right;
+		}
+
+		@media (max-width: 576px) {
+			.map-hero {
+				padding: 80px 0 56px 0;
+			}
+			.server-main h1 {
+				font-size: 28px;
+			}
+			.server-main .join {
+				width: 100%;
+				margin-top: 14px;
+			}
+			.server-main .join .btn {
+				width: 100%;
+			}
+			.server-stats {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				row-gap: 12px;
+			}
+			.server-stats div + div {
+				border-left: none;
+				padding-left: 0;
+			}
+			.server-card {
+				padding: 20px;
+			}
+			.region-tabs {
+				justify-content: flex-start;
+			}
+			.region-stage {
+				height: 300px;
+				min-height: 0;
+				padding: 0 0 56px 0;
+			}
+			.region-map img {
+				max-height: 244px;
+			}
+			.region-arrow {
+				top: auto;
+				bottom: 0;
+				transform: none;
+			}
+			.region-arrow.prev {
+				left: calc(50% - 48px);
+			}
+			.region-arrow.next {
+				right: calc(50% - 48px);
+			}
+		}
+
+	</style>
+</head>
+<body>
+	<nav class="navbar page-navbar navbar-dark navbar-expand-md fixed-top affix">
+		<div class="container">
+			<a class="navbar-brand" href="/"><strong style="font-family: Tahoma; font-weight: 700;"><span style="color: #ffd74c">SC4</span><span style="color: #d03333;">MP</span></strong></a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item">
+						<a class="nav-link" href="https://discord.gg/ErEj76JkzM" target="_blank">Discord</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="https://reddit.com/r/sc4mp" target="_blank">Reddit</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="https://twitter.com/sc4multiplayer" target="_blank">Twitter</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="https://patreon.com/sc4mp" target="_blank">Patreon</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link btn btn-primary text-light shadow-none ml-md-4" href="/#download">Download Installer</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<header class="map-hero">
+		<div class="container">
+			<a class="back" href="/#servers"><span class="ti-arrow-left"></span>&ensp;Back to servers</a>
+			<div id="server-loading" class="loading-spinner"><div class="spinner"></div></div>
+			<div id="regions" style="display: none;">
+				<ul class="region-tabs" id="region-tabs" role="tablist" aria-label="Regions"></ul>
+				<div class="region-stage">
+					<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
+					<div class="region-map" id="region-map"></div>
+					<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
+				</div>
+				<div class="region-caption">
+					<h2 id="region-name"></h2>
+					<p id="region-note"></p>
+				</div>
+			</div>
+			<p class="message" id="hero-message" style="display: none;"></p>
+		</div>
+	</header>
+	<section class="server-section" id="server" style="display: none;">
+		<div class="container">
+			<div class="server-card server-main" id="server-header"></div>
+			<div class="row">
+				<div class="col-lg-7">
+					<div class="server-card" id="server-about"></div>
+				</div>
+				<div class="col-lg-5">
+					<div class="server-card server-details" id="server-details"></div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<footer class="footer py-4 bg-dark text-light"> </footer>
+
+	<div class="city-tooltip" id="city-tooltip" role="tooltip"></div>
+
+	<script>
+
+		const SC4MP_API = 'https://api.sc4mp.org';
+		const SC4MP_INVITES_DOMAIN = 'invite.sc4mp.org';
+		const MAP_WIDTH = 1600;
+
+		const server_id = new URLSearchParams(window.location.search).get('id');
+
+		let regions = [];	// [name, info] pairs, by name
+		let current = -1;
+		let cities = [];	// the current map's cities, front to back
+
+		function api(path) {
+			return fetch(SC4MP_API + path).then(function(response) {
+				if (!response.ok) {
+					throw new Error(response.status);
+				}
+				return response.json();
+			});
+		}
+
+		function element(tag, attributes, text) {
+			const e = document.createElement(tag);
+			for (const name in (attributes || {})) {
+				e.setAttribute(name, attributes[name]);
+			}
+			if (text != null) {
+				e.textContent = text;
+			}
+			return e;
+		}
+
+		// Same as the server list
+		function format_filesize(size) {
+			if (size >= 10 ** 11) {
+				return ">99GB"
+			} else if (size >= 10 ** 10) {
+				return Math.floor(size / (10 ** 9)) + "GB"
+			} else if (size >= 10 ** 9) {
+				return Math.floor(size / (10 ** 8)) / 10 + "GB"
+			} else if (size >= 10 ** 7) {
+				return Math.floor(size / (10 ** 6)) + "MB"
+			} else if (size >= 10 ** 6) {
+				return Math.floor(size / (10 ** 5)) / 10 + "MB"
+			} else if (size >= 10 ** 4) {
+				return Math.floor(size / (10 ** 3)) + "KB"
+			} else if (size >= 10 ** 3) {
+				return Math.floor(size / (10 ** 2)) / 10 + "KB"
+			} else {
+				return size + "B"
+			}
+		}
+
+		function format_number(n) {
+			return Number(n || 0).toLocaleString('en-US');
+		}
+
+		function format_url(url) {
+			return /^https?:\/\//i.test(url) ? url : 'http://' + url;
+		}
+
+		// ===== Server =====
+
+		function show_server(server) {
+
+			const info = server.info || {};
+			const stats = server.stats || {};
+
+			document.title = 'The SimCity 4 Multiplayer Project - ' + info.server_name;
+
+			// Name and Join, then the server list's columns
+			const header = document.getElementById('server-header');
+			const top = header.appendChild(element('div', {class: 'top'}));
+			const h1 = top.appendChild(element('h1', null, info.server_name));
+			if (info.password_enabled) {	// the server list's lock
+				h1.appendChild(element('img', {src: '../assets/imgs/lock-icon.png', alt: 'Password required', title: 'Password required', width: 15, height: 20}));
+			}
+			const join = top.appendChild(element('div', {class: 'join'}));
+			join.appendChild(element('a', {class: 'btn btn-primary btn-lg', href: server.url}, 'Join'));
+			const note = join.appendChild(element('p', {class: 'launcher-note'}, 'The SC4MP Launcher is required to join. '));
+			note.appendChild(element('a', {href: '/#download'}, 'Download'));
+
+			const columns = header.appendChild(element('div', {class: 'server-stats'}));
+			[
+				[format_number(stats.stat_mayors), 'Mayors'],
+				[format_number(stats.stat_mayors_online), 'Online'],
+				[Math.floor((stats.stat_claimed || 0) * 100) + '%', 'Claimed'],
+				[format_filesize(stats.stat_download || 0), 'Download'],
+			].forEach(function(column) {
+				const div = columns.appendChild(element('div'));
+				div.appendChild(element('b', null, column[0]));
+				div.appendChild(element('span', null, column[1]));
+			});
+
+			// Description, and the server's website (like the launcher)
+			const about = document.getElementById('server-about');
+			about.appendChild(element('h5', null, 'About'));
+			about.appendChild(element('p', {class: 'server-description'}, info.server_description || 'This server has no description.'));
+			if (info.server_url) {
+				const p = about.appendChild(element('p'));
+				p.appendChild(element('a', {class: 'server-url', href: format_url(info.server_url), target: '_blank', rel: 'noopener'}, info.server_url));
+			}
+
+			// Details, like the Info tab of the launcher's server details
+			const details = document.getElementById('server-details');
+			details.appendChild(element('h5', null, 'Details'));
+			const yes_no = function(yes, good) {
+				return [yes ? 'Yes' : 'No', (yes == good) ? 'yes' : 'no'];
+			};
+			const rows = [
+				['Version', [server.version || info.server_version, '']],
+				['Public', yes_no(!info.password_enabled, true)],
+			];
+			if (info.private != null) {
+				rows.push(['Guests', yes_no(!info.private, true)]);
+			}
+			rows.push(['Custom plugins', yes_no(info.user_plugins_enabled, true)]);
+			if ('claim_duration' in info) {
+				rows.push(['Claim duration', info.claim_duration == null ? ['Forever', 'yes'] : [info.claim_duration + ' days', '']]);
+				rows.push(['Claim limit', info.max_region_claims == null ? ['None', 'yes'] : [info.max_region_claims + ' per region', '']]);
+			}
+			if (info.godmode_filter != null) {
+				rows.push(['Godmode claims', yes_no(!info.godmode_filter, true)]);
+			}
+			const table = details.appendChild(element('table'));
+			rows.forEach(function(row) {
+				const tr = table.appendChild(element('tr'));
+				tr.appendChild(element('td', null, row[0]));
+				tr.appendChild(element('td', {class: row[1][1]}, row[1][0]));
+			});
+
+			// Invite link
+			const invite_link = 'https://' + SC4MP_INVITES_DOMAIN + '/' + server_id;
+			const invite = details.appendChild(element('div', {class: 'invite-link'}));
+			invite.appendChild(element('label', {for: 'invite-link'}, 'Invite link'));
+			const group = invite.appendChild(element('div', {class: 'input-group'}));
+			const input = group.appendChild(element('input', {class: 'form-control', id: 'invite-link', type: 'text', readonly: '', value: invite_link}));
+			input.addEventListener('focus', function() { input.select(); });
+			const copy = group.appendChild(element('div', {class: 'input-group-append'})).appendChild(element('button', {class: 'btn btn-outline-primary', type: 'button'}, 'Copy'));
+			copy.addEventListener('click', function() {
+				navigator.clipboard.writeText(invite_link).then(function() {
+					copy.textContent = 'Copied';
+					setTimeout(function() { copy.textContent = 'Copy'; }, 2000);
+				});
+			});
+
+			document.getElementById('server').style.display = '';
+		}
+
+		// ===== Regions =====
+
+		function show_regions(data) {
+
+			regions = Object.keys(data).sort().map(function(name) { return [name, data[name]]; }).filter(function(region) { return region[1].ready > 0; });
+
+			if (regions.length == 0) {
+				show_message('This server has no region maps yet.');
+				return;
+			}
+
+			document.getElementById('server-loading').style.display = 'none';
+
+			document.getElementById('regions').style.display = '';	// the map stage, at the top
+
+			const tabs = document.getElementById('region-tabs');
+			regions.forEach(function(region, i) {
+				const tab = tabs.appendChild(element('li')).appendChild(element('a', {role: 'tab', href: '#' + encodeURIComponent(region[0])}, region[0]));
+				tab.addEventListener('click', function(e) {
+					e.preventDefault();
+					show_region(i);
+				});
+			});
+
+			const prev = document.getElementById('region-prev');
+			const next = document.getElementById('region-next');
+			prev.addEventListener('click', function() { show_region(current - 1); });
+			next.addEventListener('click', function() { show_region(current + 1); });
+			prev.style.display = next.style.display = (regions.length > 1) ? '' : 'none';
+			document.addEventListener('keydown', function(e) {
+				if (e.target.closest && e.target.closest('input, textarea')) {
+					return;
+				}
+				if (e.key == 'ArrowLeft') {
+					show_region(current - 1);
+				} else if (e.key == 'ArrowRight') {
+					show_region(current + 1);
+				}
+			});
+
+			const hash = decodeURIComponent(window.location.hash.slice(1));
+			const start = regions.findIndex(function(region) { return region[0] == hash; });
+			show_region(start >= 0 ? start : 0);
+		}
+
+		function map_url(region) {
+			return SC4MP_API + region.map + '?width=' + MAP_WIDTH;
+		}
+
+		function show_region(i) {
+
+			i = (i + regions.length) % regions.length;
+			if (i == current) {
+				return;
+			}
+			current = i;
+
+			const name = regions[i][0];
+			const region = regions[i][1];
+
+			history.replaceState(null, '', '#' + encodeURIComponent(name));
+
+			document.getElementById('region-name').textContent = name;
+			set_region_note(region, null);
+
+			document.querySelectorAll('#region-tabs a').forEach(function(tab, j) {
+				tab.classList.toggle('active', j == i);
+				tab.setAttribute('aria-selected', j == i);
+				if (j == i && tab.parentNode.parentNode.scrollWidth > tab.parentNode.parentNode.clientWidth) {	// keep it in view when the tabs scroll (phones)
+					tab.parentNode.parentNode.scrollLeft = tab.parentNode.offsetLeft - tab.parentNode.parentNode.offsetLeft - 40;
+				}
+			});
+
+			const map = document.getElementById('region-map');
+			hide_city();
+			cities = [];
+
+			// The map and its outline layer are made once; switching regions fades the old map until the new one has loaded
+			let svg = map.querySelector('svg');
+			if (!svg) {
+				svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+				svg.setAttribute('viewBox', '0 0 1 1');
+				svg.setAttribute('preserveAspectRatio', 'none');
+				map.appendChild(svg);
+			}
+			map.classList.add('loading');
+
+			let loaded = false;
+			let data = null;
+			const next_map = new Image();
+			next_map.onload = function() {
+				if (current != i) {
+					return;
+				}
+				next_map.alt = 'Map of ' + name;
+				next_map.className = 'shown';
+				const old = map.querySelector('img');
+				if (old) {
+					map.replaceChild(next_map, old);	// the loaded image itself, so there's no blank moment
+				} else {
+					map.insertBefore(next_map, svg);
+				}
+				map.classList.remove('loading');
+				loaded = true;
+				if (data) {
+					cities = data.cities;
+				}
+				[i - 1, i + 1].forEach(function(j) {	// so flipping to the next region is quick
+					new Image().src = map_url(regions[(j + regions.length) % regions.length][1]);
+				});
+			};
+			next_map.src = map_url(region);
+
+			if (region.map_cities) {
+				api(region.map_cities).then(function(result) {
+					data = result;
+					if (current == i) {
+						set_region_note(region, data.cities);
+					}
+					if (current == i && loaded) {
+						cities = data.cities;
+					}
+				}).catch(function() {});
+			}
+
+			map.onmousemove = function(e) {
+				const rect = map.querySelector('img').getBoundingClientRect();
+				const city = city_at((e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height);
+				if (city) {
+					show_city(city, svg, e.clientX, e.clientY);
+				} else {
+					hide_city();
+				}
+			};
+			map.onclick = map.onmousemove;	// tapping a city on a phone
+			map.onmouseleave = hide_city;
+		}
+
+		// Under the map: how many cities, and how many are claimed once the map's cities have loaded
+		function set_region_note(region, map_cities) {
+			let note = format_number(region.cities) + (region.cities == 1 ? ' city' : ' cities');
+			if (map_cities) {
+				const claimed = map_cities.filter(function(city) { return city.claimed; }).length;
+				note += ', ' + format_number(claimed) + ' claimed';
+			}
+			if (map_cities && map_cities.length) {
+				note += '. ' + (window.matchMedia('(hover: hover)').matches ? 'Hover over' : 'Tap') + ' a city to see its mayor and population.';
+			}
+			document.getElementById('region-note').textContent = note;
+		}
+
+		// ===== Cities =====
+
+		function inside(x, y, outline) {
+			let result = false;
+			for (let i = 0, j = outline.length - 1; i < outline.length; j = i++) {
+				const [xi, yi] = outline[i];
+				const [xj, yj] = outline[j];
+				if ((yi > y) != (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
+					result = !result;
+				}
+			}
+			return result;
+		}
+
+		function city_at(x, y) {
+			return cities.find(function(city) { return inside(x, y, city.outline); });	// front to back, so the nearest city wins
+		}
+
+		let shown = null;
+
+		function show_city(city, svg, x, y) {
+
+			const tooltip = document.getElementById('city-tooltip');
+
+			if (city !== shown) {
+
+				shown = city;
+
+				svg.innerHTML = '';
+				const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+				polygon.setAttribute('points', city.outline.map(function(p) { return p.join(','); }).join(' '));
+				svg.appendChild(polygon);
+
+				// Same as the Cities tab of the launcher's server details
+				tooltip.innerHTML = '';
+				tooltip.appendChild(element('h6', null, city.city_name || 'New City'));
+				if (city.claimed === false) {
+					tooltip.appendChild(element('div', {class: 'text-muted'}, 'Unclaimed'));
+				}
+				const table = element('table');
+				const row = function(label, value) {
+					const tr = element('tr');
+					tr.appendChild(element('td', null, label));
+					tr.appendChild(element('td', null, value));
+					table.appendChild(tr);
+				};
+				const sizes = {1: 'Small', 2: 'Medium', 4: 'Large'};
+				row('Mayor', city.mayor_name || 'Defacto');
+				row('Size', sizes[city.size] || 'None');
+				if (city.mayor_rating != null) {
+					row('Rating', city.mayor_rating);
+					row('Funds', '§' + format_number(city.total_funds));
+					row('Residential', format_number(city.residential_population));
+					row('Commercial', format_number(city.commercial_population));
+					row('Industrial', format_number(city.industrial_population));
+				}
+				if (city.modified) {
+					row('Modified', moment(city.modified, 'YYYY-MM-DD HH:mm:ss').fromNow());
+				}
+				tooltip.appendChild(table);
+
+				tooltip.style.display = 'block';
+			}
+
+			// Beside the cursor, kept on screen
+			const margin = 16;
+			let left = x + margin;
+			let top = y + margin;
+			if (left + tooltip.offsetWidth > window.innerWidth - 8) {
+				left = x - margin - tooltip.offsetWidth;
+			}
+			if (top + tooltip.offsetHeight > window.innerHeight - 8) {
+				top = y - margin - tooltip.offsetHeight;
+			}
+			tooltip.style.left = Math.max(8, left) + 'px';
+			tooltip.style.top = Math.max(8, top) + 'px';
+		}
+
+		function hide_city() {
+			shown = null;
+			document.getElementById('city-tooltip').style.display = 'none';
+			const svg = document.querySelector('#region-map svg');
+			if (svg) {
+				svg.innerHTML = '';
+			}
+		}
+
+		// ===== Load =====
+
+		// In place of the map, eg. when the server or its maps can't be found
+		function show_message(message, link) {
+			document.getElementById('server-loading').style.display = 'none';
+			const p = document.getElementById('hero-message');
+			p.textContent = message + ' ';
+			if (link) {
+				p.appendChild(element('a', {href: '/#servers'}, 'See all servers.'));
+			}
+			p.style.display = '';
+		}
+
+		if (!server_id) {
+			show_message('No server was chosen.', true);
+		} else {
+			api('/servers/' + encodeURIComponent(server_id)).then(function(server) {
+				show_server(server);
+				return api('/servers/' + encodeURIComponent(server_id) + '/regions').then(show_regions).catch(function() {
+					show_message('This server has no region maps yet.');
+				});
+			}, function() {
+				show_message('This server isn\'t in the server list right now. It may be offline.', true);
+			});
+		}
+
+	</script>
+
+	<!-- core  -->
+	<script src="../assets/vendors/jquery/jquery-3.4.1.js"></script>
+	<script src="../assets/vendors/bootstrap/bootstrap.bundle.js"></script>
+
+</body>
+</html>

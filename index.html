@@ -168,6 +168,7 @@
 							entry["Claimed"] = Number(server.stats.stat_claimed);
 							entry["Download"] = Number(server.stats.stat_download);
 							entry["Join"] = server.url;
+							entry["Page"] = server.info.server_id ? "server/?id=" + encodeURIComponent(server.info.server_id) : server.info.server_url;	// the server's page, with its region maps
                             total_mayors += entry["Mayors"];
                             total_mayors_online += entry["Online"];
                             total_servers += 1;
@@ -201,9 +202,8 @@
 								height:"20px",
 								width:"15px",
 							}},
-							{title: "Name", field: "URL", resizable: false, hozAlign:"left", sorter: "string", minWidth: 150, responsive: 0, formatter:"link", formatterParams:{
+							{title: "Name", field: "Page", resizable: false, hozAlign:"left", sorter: "string", minWidth: 150, responsive: 0, formatter:"link", formatterParams:{
 								labelField:"Name",
-								target:"_blank",
 							}},
 							{title: "Mayors", field: "Mayors", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 2, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
 							{title: "Online", field: "Online", resizable: false, hozAlign:"center", sorter: "number", width: 100, responsive: 3, formatter: function(cell) {return (cell.getValue() == null) ? "" : cell.getValue()}},
@@ -214,6 +214,14 @@
 						initialSort:[
 							{column:"Mayors", dir:"dec"},
 						],
+					});
+
+					// Clicking anywhere on a server opens its page
+					table.on("rowClick", function(e, row) {
+						const page = row.getData()["Page"];
+						if (!e.target.closest("a") && page && page.startsWith("server/")) {
+							window.location.href = page;
+						}
 					});
 
                     if (total_mayors_online == 1) {
