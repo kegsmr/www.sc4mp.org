@@ -858,7 +858,7 @@
 			}
 			const hover = window.matchMedia('(hover: hover)').matches;
 			if (map_cities && map_cities.length) {
-				note += '. ' + (hover ? 'Hover over' : 'Tap') + ' a city to see its mayor and population.';
+				note += '. ' + (window.matchMedia('(hover: hover)').matches ? 'Hover over' : 'Tap') + ' a city to see its mayor and population.';
 			} else {
 				note += '.';
 			}
