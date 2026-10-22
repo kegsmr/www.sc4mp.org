@@ -149,32 +149,52 @@
 			}
 		}
 
-		/* Region maps, with a tab for each region like the launcher */
+		/* Region maps, on a dark stage like SC4's region view, with a tab for each region like the launcher */
 
 		.regions-section {
-			padding: 24px 0 40px 0;
+			background: radial-gradient(ellipse at 50% 45%, #2c3e50 0%, #141c25 75%);
+			color: white;
+			padding: 28px 0 32px 0;
 		}
 
 		.region-tabs {
+			display: flex;
+			justify-content: center;
 			flex-wrap: nowrap;
 			overflow-x: auto;
-			overflow-y: hidden;
-			margin-bottom: 24px;
+			list-style: none;
+			padding: 0 0 4px 0;
+			margin: 0 0 20px 0;
 		}
 
-		.region-tabs .nav-link {
+		.region-tabs a {
+			display: block;
 			white-space: nowrap;
-			color: #555;
+			padding: 6px 18px;
+			margin: 0 4px;
+			border-radius: 20px;
+			color: rgba(255, 255, 255, 0.7);
 			cursor: pointer;
 		}
 
-		.region-tabs .nav-link.active {
-			color: #D03333;
+		.region-tabs a:hover {
+			color: white;
+			background: rgba(255, 255, 255, 0.1);
+			text-decoration: none;
+		}
+
+		.region-tabs a.active {
+			color: white;
+			background: #D03333;
 		}
 
 		.region-stage {
 			position: relative;
-			padding: 0 56px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 360px;	/* so the page doesn't jump while the first map loads */
+			padding: 0 64px;
 		}
 
 		.region-map {
@@ -186,7 +206,8 @@
 
 		.region-map img {
 			max-width: 100%;
-			max-height: 75vh;
+			max-height: 72vh;
+			filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
 			transition: opacity 0.25s;
 		}
 
@@ -211,18 +232,20 @@
 			position: absolute;
 			top: 50%;
 			transform: translateY(-50%);
-			width: 40px;
-			height: 40px;
+			width: 44px;
+			height: 44px;
 			padding: 0;
-			border: 1px solid #ccc;
+			border: none;
 			border-radius: 50%;
-			background: white;
-			color: #555;
+			background: rgba(255, 255, 255, 0.12);
+			color: white;
+			font-size: 1.1rem;
 		}
 
-		.region-arrow:hover {
-			color: #D03333;
-			border-color: #D03333;
+		.region-arrow:hover,
+		.region-arrow:focus-visible {
+			background: #D03333;
+			outline: none;
 		}
 
 		.region-arrow.prev {
@@ -242,22 +265,40 @@
 			pointer-events: none;
 		}
 
+		/* The city under the cursor, in the logo's yellow */
 		.region-map polygon {
-			fill: none;
-			stroke: white;
+			fill: rgba(255, 215, 76, 0.18);
+			stroke: #ffd74c;
 			stroke-width: 2px;
 			vector-effect: non-scaling-stroke;
 		}
 
+		.region-caption {
+			margin-top: 18px;
+		}
+
+		.region-caption h2 {
+			font-size: 1.6rem;
+			font-weight: 300;
+			margin: 0;
+		}
+
+		.region-caption p {
+			color: rgba(255, 255, 255, 0.6);
+			font-size: 0.9rem;
+			margin: 4px 0 0 0;
+		}
 
 		/* City info, like the Cities tab of the launcher's server details */
 		.city-tooltip {
 			position: fixed;
 			z-index: 1050;
-			min-width: 200px;
+			min-width: 210px;
 			background: white;
-			border: 1px solid #999;
-			padding: 6px 10px;
+			border-top: 3px solid #ffd74c;
+			border-radius: 4px;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+			padding: 8px 12px;
 			font-size: 0.85rem;
 			text-align: left;
 			pointer-events: none;
@@ -289,8 +330,12 @@
 			.server-header h1 {
 				font-size: 32px;
 			}
+			.region-tabs {
+				justify-content: flex-start;
+			}
 			.region-stage {
-				padding: 0 0 52px 0;
+				min-height: 200px;
+				padding: 0 0 56px 0;
 			}
 			.region-arrow {
 				top: auto;
@@ -344,13 +389,16 @@
 	</header>
 	<section class="regions-section" id="regions" style="display: none;">
 		<div class="container text-center">
-			<ul class="nav nav-tabs region-tabs" id="region-tabs" role="tablist" aria-label="Regions"></ul>
+			<ul class="region-tabs" id="region-tabs" role="tablist" aria-label="Regions"></ul>
 			<div class="region-stage">
 				<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
 				<div class="region-map" id="region-map"></div>
 				<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
 			</div>
-			<p class="text-muted small mt-3 mb-0" id="region-note"></p>
+			<div class="region-caption">
+				<h2 id="region-name"></h2>
+				<p id="region-note"></p>
+			</div>
 		</div>
 	</section>
 	<section class="about-section bg-light" id="server" style="display: none;">
@@ -519,7 +567,7 @@
 
 			const tabs = document.getElementById('region-tabs');
 			regions.forEach(function(region, i) {
-				const tab = tabs.appendChild(element('li', {class: 'nav-item'})).appendChild(element('a', {class: 'nav-link', role: 'tab', href: '#' + encodeURIComponent(region[0])}, region[0]));
+				const tab = tabs.appendChild(element('li')).appendChild(element('a', {role: 'tab', href: '#' + encodeURIComponent(region[0])}, region[0]));
 				tab.addEventListener('click', function(e) {
 					e.preventDefault();
 					show_region(i);
@@ -564,13 +612,10 @@
 
 			history.replaceState(null, '', '#' + encodeURIComponent(name));
 
-			let note = format_number(region.cities) + (region.cities == 1 ? ' city' : ' cities');
-			if (region.ready < region.cities) {
-				note += ' (' + format_number(region.cities - region.ready) + ' not on the map yet)';
-			}
-			document.getElementById('region-note').textContent = note;
+			document.getElementById('region-name').textContent = name;
+			set_region_note(region, null);
 
-			document.querySelectorAll('#region-tabs .nav-link').forEach(function(tab, j) {
+			document.querySelectorAll('#region-tabs a').forEach(function(tab, j) {
 				tab.classList.toggle('active', j == i);
 				tab.setAttribute('aria-selected', j == i);
 				if (j == i && tab.parentNode.parentNode.scrollWidth > tab.parentNode.parentNode.clientWidth) {	// keep it in view when the tabs scroll (phones)
@@ -621,6 +666,9 @@
 			if (region.map_cities) {
 				api(region.map_cities).then(function(result) {
 					data = result;
+					if (current == i) {
+						set_region_note(region, data.cities);
+					}
 					if (current == i && loaded) {
 						cities = data.cities;
 					}
@@ -638,6 +686,22 @@
 			};
 			map.onclick = map.onmousemove;	// tapping a city on a phone
 			map.onmouseleave = hide_city;
+		}
+
+		// Under the map: how many cities, and how many are claimed once the map's cities have loaded
+		function set_region_note(region, map_cities) {
+			let note = format_number(region.cities) + (region.cities == 1 ? ' city' : ' cities');
+			if (map_cities) {
+				const claimed = map_cities.filter(function(city) { return city.claimed; }).length;
+				note += ', ' + format_number(claimed) + ' claimed';
+			}
+			if (region.ready < region.cities) {
+				note += ' (' + format_number(region.cities - region.ready) + ' not on the map yet)';
+			}
+			if (map_cities && map_cities.length) {
+				note += '. ' + (window.matchMedia('(hover: hover)').matches ? 'Hover over' : 'Tap') + ' a city to see its mayor and population.';
+			}
+			document.getElementById('region-note').textContent = note;
 		}
 
 		// ===== Cities =====
