@@ -23,64 +23,82 @@
 
 	<style>
 
-		/* A shorter version of the home page's header */
-		.server-header {
-			background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), #efefef url(../assets/imgs/header.jpg);
-			background-size: cover;
-			background-position: center center;
+		/* The region map first, on a darker version of the grid SC4 shows behind cities and regions: 8 px squares with 2 px lines, and darker edges */
+		.map-hero {
+			background:
+				radial-gradient(ellipse at 50% 55%, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.3) 100%),
+				linear-gradient(90deg, rgba(0, 0, 0, 0.07) 2px, transparent 2px) -1px 0 / 8px 8px,
+				linear-gradient(rgba(0, 0, 0, 0.07) 2px, transparent 2px) 0 -1px / 8px 8px,
+				#3c6078;
 			color: white;
-			padding: 96px 0 36px 0;
+			padding: 88px 0 28px 0;
 			text-align: center;
 		}
 
-		.server-header .back {
+		.map-hero .back {
 			display: block;
 			text-align: left;
 			color: rgba(255, 255, 255, 0.75);
 			font-size: 0.9rem;
-			margin-bottom: 16px;
+			margin-bottom: 12px;
 		}
 
-		.server-header .back:hover {
+		.map-hero .back:hover {
 			color: white;
 			text-decoration: none;
 		}
 
-		.server-header h1 {
-			font-size: 46px;
-			font-weight: 100;
-			word-wrap: break-word;
-			margin-bottom: 12px;
+		.map-hero .message {
+			font-size: 1.1rem;
+			margin: 48px 0;
 		}
 
-		.server-header h1 img {
-			vertical-align: 6px;
-			margin-left: 10px;
-		}
-
-		.server-header .counts {
-			margin-bottom: 20px;
-		}
-
-		.server-header .btn {
-			width: 160px;
-			margin: 6px;
-			box-shadow: none;
-		}
-
-		.server-header .launcher-note {
-			margin: 14px 0 0 0;
-			font-size: 0.85rem;
-			color: rgba(255, 255, 255, 0.7);
-		}
-
-		.server-header .launcher-note a {
+		.map-hero .message a {
 			color: white;
 			text-decoration: underline;
 		}
 
-		.about-section {
-			padding: 48px 0 56px 0;
+		/* The server, under its map */
+		.server-section {
+			padding: 40px 0 64px 0;
+		}
+
+		.server-title {
+			text-align: center;
+			margin-bottom: 40px;
+		}
+
+		.server-title h1 {
+			font-size: 42px;
+			font-weight: 300;
+			color: #333;
+			word-wrap: break-word;
+			margin-bottom: 8px;
+		}
+
+		.server-title h1 img {
+			vertical-align: 6px;
+			margin-left: 10px;
+		}
+
+		.server-title .counts {
+			color: #555;
+			margin-bottom: 20px;
+		}
+
+		.server-title .btn {
+			min-width: 160px;
+			margin: 6px;
+		}
+
+		.server-title .launcher-note {
+			margin: 10px 0 0 0;
+			font-size: 0.85rem;
+			color: #777;
+		}
+
+		.server-title .launcher-note a {
+			color: #D03333;
 		}
 
 		.server-description {
@@ -150,12 +168,6 @@
 		}
 
 		/* Region maps, on a dark stage like SC4's region view, with a tab for each region like the launcher */
-
-		.regions-section {
-			background: radial-gradient(ellipse at 50% 45%, #2c3e50 0%, #141c25 75%);
-			color: white;
-			padding: 28px 0 32px 0;
-		}
 
 		.region-tabs {
 			display: flex;
@@ -324,10 +336,10 @@
 		}
 
 		@media (max-width: 576px) {
-			.server-header {
-				padding: 100px 0 40px 0;
+			.map-hero {
+				padding: 80px 0 24px 0;
 			}
-			.server-header h1 {
+			.server-title h1 {
 				font-size: 32px;
 			}
 			.region-tabs {
@@ -380,29 +392,28 @@
 			</div>
 		</div>
 	</nav>
-	<header class="server-header">
+	<header class="map-hero">
 		<div class="container">
 			<a class="back" href="/#servers"><span class="ti-arrow-left"></span>&ensp;Back to servers</a>
 			<div id="server-loading" class="loading-spinner"><div class="spinner"></div></div>
-			<div id="server-header"></div>
+			<div id="regions" style="display: none;">
+				<ul class="region-tabs" id="region-tabs" role="tablist" aria-label="Regions"></ul>
+				<div class="region-stage">
+					<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
+					<div class="region-map" id="region-map"></div>
+					<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
+				</div>
+				<div class="region-caption">
+					<h2 id="region-name"></h2>
+					<p id="region-note"></p>
+				</div>
+			</div>
+			<p class="message" id="hero-message" style="display: none;"></p>
 		</div>
 	</header>
-	<section class="regions-section" id="regions" style="display: none;">
-		<div class="container text-center">
-			<ul class="region-tabs" id="region-tabs" role="tablist" aria-label="Regions"></ul>
-			<div class="region-stage">
-				<button type="button" class="region-arrow prev" id="region-prev" aria-label="Previous region"><span class="ti-angle-left"></span></button>
-				<div class="region-map" id="region-map"></div>
-				<button type="button" class="region-arrow next" id="region-next" aria-label="Next region"><span class="ti-angle-right"></span></button>
-			</div>
-			<div class="region-caption">
-				<h2 id="region-name"></h2>
-				<p id="region-note"></p>
-			</div>
-		</div>
-	</section>
-	<section class="about-section bg-light" id="server" style="display: none;">
+	<section class="server-section" id="server" style="display: none;">
 		<div class="container">
+			<div class="server-title" id="server-header"></div>
 			<div class="row">
 				<div class="col-lg-7 mb-4" id="server-about"></div>
 				<div class="col-lg-5">
@@ -560,10 +571,13 @@
 			regions = Object.keys(data).sort().map(function(name) { return [name, data[name]]; }).filter(function(region) { return region[1].ready > 0; });
 
 			if (regions.length == 0) {
+				show_message('This server has no region maps yet.');
 				return;
 			}
 
-			document.getElementById('regions').style.display = '';
+			document.getElementById('server-loading').style.display = 'none';
+
+			document.getElementById('regions').style.display = '';	// the map stage, at the top
 
 			const tabs = document.getElementById('region-tabs');
 			regions.forEach(function(region, i) {
@@ -793,21 +807,27 @@
 
 		// ===== Load =====
 
-		function show_missing(message) {
+		// In place of the map, eg. when the server or its maps can't be found
+		function show_message(message, link) {
 			document.getElementById('server-loading').style.display = 'none';
-			const p = document.getElementById('server-header').appendChild(element('p', {class: 'lead my-4'}, message + ' '));
-			p.appendChild(element('a', {href: '/#servers', class: 'text-white', style: 'text-decoration: underline;'}, 'See all servers.'));
+			const p = document.getElementById('hero-message');
+			p.textContent = message + ' ';
+			if (link) {
+				p.appendChild(element('a', {href: '/#servers'}, 'See all servers.'));
+			}
+			p.style.display = '';
 		}
 
 		if (!server_id) {
-			show_missing('No server was chosen.');
+			show_message('No server was chosen.', true);
 		} else {
 			api('/servers/' + encodeURIComponent(server_id)).then(function(server) {
-				document.getElementById('server-loading').style.display = 'none';
 				show_server(server);
-				return api('/servers/' + encodeURIComponent(server_id) + '/regions').then(show_regions).catch(function() {});
-			}).catch(function() {
-				show_missing('This server isn\'t in the server list right now. It may be offline.');
+				return api('/servers/' + encodeURIComponent(server_id) + '/regions').then(show_regions).catch(function() {
+					show_message('This server has no region maps yet.');
+				});
+			}, function() {
+				show_message('This server isn\'t in the server list right now. It may be offline.', true);
 			});
 		}
 
